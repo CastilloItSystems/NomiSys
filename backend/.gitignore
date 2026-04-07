@@ -9,6 +9,8 @@ node_modules
 **/*.d.ts
 **/*.map
 !dist/**
+# Keep Express Request augmentation (needed for TypeScript compilation in CI)
+!src/types/express.d.ts
 # Exceptions for specific files if needed can be added with !path/file.js
 
 # Prisma seeds - only track .ts files

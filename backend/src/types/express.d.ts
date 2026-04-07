@@ -1,0 +1,27 @@
+import {
+  PrismaClient,
+  Membership,
+  CompanyRole,
+} from '../generated/prisma/client.js'
+
+declare global {
+  namespace Express {
+    interface Request {
+      user?: {
+        userId: string
+        email?: string
+        access?: string
+      }
+      companyId?: string
+      prisma?: PrismaClient
+      membership?: Membership & {
+        role?: CompanyRole
+      }
+      validatedBody?: unknown
+      validatedQuery?: unknown
+      validatedParams?: unknown
+    }
+  }
+}
+
+export {}
