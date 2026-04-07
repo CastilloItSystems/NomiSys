@@ -2,7 +2,7 @@ import {
   PrismaClient,
   Membership,
   CompanyRole,
-} from '../generated/prisma/client.js'
+} from '@/generated/prisma/client'
 
 declare global {
   namespace Express {
