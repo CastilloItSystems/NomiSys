@@ -77,6 +77,7 @@ const UsuarioList = () => {
     try {
       setLoading(true);
       const response = await getUsers();
+      console.log(response);
       setUsuarios(response.users ?? []);
     } catch (error) {
       console.error("Error cargando usuarios:", error);
@@ -243,7 +244,7 @@ const UsuarioList = () => {
       <div className="flex flex-column gap-1">
         {memberships.map((membership) => (
           <div key={membership.id} className="text-sm">
-            <strong>{membership.empresa?.name ?? membership.empresaId}</strong>
+            <strong>{membership.company?.name ?? membership.companyId}</strong>
             {membership.role?.name ? ` — ${membership.role.name}` : ""}
           </div>
         ))}

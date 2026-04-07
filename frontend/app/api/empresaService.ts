@@ -72,9 +72,29 @@ export interface CreateEmpresaRequest {
   name: string;
   address?: string | null;
   phones?: string | null;
+  fax?: string | null;
+  rif?: string | null;
+  nit?: string | null;
+  website?: string | null;
   email?: string | null;
   contact?: string | null;
   isDefault?: boolean;
+  support1?: string | null;
+  support2?: string | null;
+  support3?: string | null;
+  usesWeb?: boolean;
+  dbServer?: string | null;
+  dbUser?: string | null;
+  dbPassword?: string | null;
+  dbPort?: string | null;
+  license?: string | null;
+  archived?: boolean;
+  additionalInfo?: string | null;
+  usesPrefix?: boolean;
+  prefixName?: string | null;
+  dbPrefix?: string | null;
+  serverPrefix?: string | null;
+  userPrefix?: string | null;
   logoUrl?: string | null;
 }
 
@@ -82,9 +102,29 @@ export interface UpdateEmpresaRequest {
   name?: string;
   address?: string | null;
   phones?: string | null;
+  fax?: string | null;
+  rif?: string | null;
+  nit?: string | null;
+  website?: string | null;
   email?: string | null;
   contact?: string | null;
   isDefault?: boolean;
+  support1?: string | null;
+  support2?: string | null;
+  support3?: string | null;
+  usesWeb?: boolean;
+  dbServer?: string | null;
+  dbUser?: string | null;
+  dbPassword?: string | null;
+  dbPort?: string | null;
+  license?: string | null;
+  archived?: boolean;
+  additionalInfo?: string | null;
+  usesPrefix?: boolean;
+  prefixName?: string | null;
+  dbPrefix?: string | null;
+  serverPrefix?: string | null;
+  userPrefix?: string | null;
   logoUrl?: string | null;
   deleted?: boolean;
 }
@@ -109,9 +149,7 @@ export const getEmpresaPredeterminada = async (): Promise<Empresa> => {
 export const createEmpresa = async (
   data: CreateEmpresaRequest,
 ): Promise<Empresa> => {
-  const { name, address, phones, email, contact, isDefault, logoUrl } = data;
-  const payload = { name, address: address || null, phones: phones || null, email: email || null, contact: contact || null, isDefault, logoUrl };
-  const response = await apiClient.post("/companies", payload);
+  const response = await apiClient.post("/companies", data);
   return response.data.data;
 };
 
@@ -119,9 +157,7 @@ export const updateEmpresa = async (
   id: string,
   data: UpdateEmpresaRequest,
 ): Promise<Empresa> => {
-  const { name, address, phones, email, contact, isDefault, logoUrl, deleted } = data;
-  const payload = { name, address: address || null, phones: phones || null, email: email || null, contact: contact || null, isDefault, logoUrl, deleted };
-  const response = await apiClient.put(`/companies/${id}`, payload);
+  const response = await apiClient.put(`/companies/${id}`, data);
   return response.data.data;
 };
 

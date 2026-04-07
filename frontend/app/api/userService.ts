@@ -20,13 +20,13 @@ export interface MembershipEmpresa {
 export interface Membership {
   id: string;
   userId: string;
-  empresaId: string;
+  companyId: string;
   roleId: string;
   status: MembershipStatus;
   assignedBy?: string | null;
   assignedAt: string;
   updatedAt: string;
-  empresa?: MembershipEmpresa;
+  company?: MembershipEmpresa;
   role?: MembershipRole;
 }
 
@@ -138,7 +138,7 @@ export interface UpdateMembershipRequest {
 
 export const getUsers = async (): Promise<UsersResponse> => {
   const response = await apiClient.get("/users");
-  return response.data;
+  return response.data.data;
 };
 
 export const getUser = async (id: string): Promise<User> => {
@@ -185,7 +185,7 @@ export const getAuditLogsForUser = async (
   id: string,
 ): Promise<AuditLogsResponse> => {
   const response = await apiClient.get(`/users/${id}/audit-logs`);
-  return response.data;
+  return response.data.data;
 };
 
 // ── Memberships ─────────────────────────────────────────────────────────────
@@ -193,14 +193,14 @@ export const getAuditLogsForUser = async (
 export const getMembershipsByEmpresa =
   async (): Promise<MembershipsResponse> => {
     const response = await apiClient.get("/memberships");
-    return response.data;
+    return response.data.data;
   };
 
 export const getMembershipsByUser = async (
   userId: string,
 ): Promise<MembershipsResponse> => {
   const response = await apiClient.get(`/memberships/user/${userId}`);
-  return response.data;
+  return response.data.data;
 };
 
 export const createMembership = async (

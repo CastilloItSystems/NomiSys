@@ -1,19 +1,39 @@
 model Company {
-  id              String       @id @default(cuid())
-  name            String
-  address         String?
-  phones          String?
-  email           String?
-  contact         String?
-  deleted         Boolean      @default(false)
-  logoUrl         String?      @map("logo_url")
-  isDefault       Boolean      @default(false)
+  id               String       @id @default(cuid())
+  name             String
+  address          String?
+  phones           String?
+  fax              String?
+  rif              String?
+  nit              String?
+  website          String?
+  email            String?
+  contact          String?
+  isDefault        Boolean      @default(false)
+  support1         String?
+  support2         String?
+  support3         String?
+  usesWeb          Boolean      @default(false)
+  dbServer         String?
+  dbUser           String?
+  dbPassword       String?
+  dbPort           String?
+  license          String?
+  archived         Boolean      @default(false)
+  additionalInfo   String?
+  usesPrefix       Boolean      @default(false)
+  prefixName       String?
+  dbPrefix         String?
+  serverPrefix     String?
+  userPrefix       String?
+  logoUrl          String?      @map("logo_url")
+  deleted          Boolean      @default(false)
 
-  memberships     Membership[]
-  companyRoles    CompanyRole[]
+  memberships      Membership[]
+  companyRoles     CompanyRole[]
 
-  createdAt       DateTime     @default(now())
-  updatedAt       DateTime     @updatedAt
+  createdAt        DateTime     @default(now())
+  updatedAt        DateTime     @updatedAt
 
   @@map("Company")
 }

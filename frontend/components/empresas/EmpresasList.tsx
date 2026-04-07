@@ -71,24 +71,24 @@ const EmpresasList = () => {
       address: e.address ?? undefined,
       phones: e.phones ?? undefined,
       fax: e.fax ?? undefined,
-      numerorif: e.numerorif ?? undefined,
-      numeronit: e.numeronit ?? undefined,
+      rif: e.rif ?? undefined,
+      nit: e.nit ?? undefined,
       website: e.website ?? undefined,
       email: e.email ?? undefined,
       contact: e.contact ?? undefined,
-      soporte1: e.soporte1 ?? undefined,
-      soporte2: e.soporte2 ?? undefined,
-      soporte3: e.soporte3 ?? undefined,
-      data_servidor: e.data_servidor ?? undefined,
-      data_usuario: e.data_usuario ?? undefined,
-      data_password: e.data_password ?? undefined,
-      data_port: e.data_port ?? undefined,
-      licencia: e.licencia ?? undefined,
-      masinfo: e.masinfo ?? undefined,
-      name_prefijo: e.name_prefijo ?? undefined,
-      dprefijobd: e.dprefijobd ?? undefined,
-      dprefijosrv: e.dprefijosrv ?? undefined,
-      dprefijousr: e.dprefijousr ?? undefined,
+      support1: e.support1 ?? undefined,
+      support2: e.support2 ?? undefined,
+      support3: e.support3 ?? undefined,
+      dbServer: e.dbServer ?? undefined,
+      dbUser: e.dbUser ?? undefined,
+      dbPassword: e.dbPassword ?? undefined,
+      dbPort: e.dbPort ?? undefined,
+      license: e.license ?? undefined,
+      additionalInfo: e.additionalInfo ?? undefined,
+      prefixName: e.prefixName ?? undefined,
+      dbPrefix: e.dbPrefix ?? undefined,
+      serverPrefix: e.serverPrefix ?? undefined,
+      userPrefix: e.userPrefix ?? undefined,
     } as Empresa;
   };
 
@@ -96,7 +96,7 @@ const EmpresasList = () => {
     try {
       setLoading(true);
       const empresasDB = await getEmpresas();
-      const raw = empresasDB?.data.companies ?? [];
+      const raw = empresasDB?.companies ?? [];
       const normalized = raw.map(normalizeEmpresa);
       setEmpresas(normalized);
     } catch (error) {
@@ -304,13 +304,7 @@ const EmpresasList = () => {
           scrollable
           rowsPerPageOptions={[10, 25, 50]}
           filters={filters}
-          globalFilterFields={[
-            "name",
-            "numerorif",
-            "address",
-            "email",
-            "name_prefijo",
-          ]}
+          globalFilterFields={["name", "rif", "address", "email", "prefixName"]}
           loading={loading}
           emptyMessage="No se encontraron empresas."
           size="small"
@@ -322,7 +316,7 @@ const EmpresasList = () => {
             style={{ minWidth: "200px" }}
           ></Column>
           <Column
-            field="numerorif"
+            field="rif"
             header="RIF"
             sortable
             style={{ minWidth: "120px" }}
@@ -334,7 +328,7 @@ const EmpresasList = () => {
             style={{ minWidth: "250px" }}
           ></Column>
           <Column
-            field="name_prefijo"
+            field="prefixName"
             header="Prefijo"
             sortable
             style={{ minWidth: "150px" }}

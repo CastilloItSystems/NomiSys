@@ -56,28 +56,28 @@ const EmpresaForm = ({
       address: "",
       phones: "",
       fax: "",
-      numerorif: "",
-      numeronit: "",
+      rif: "",
+      nit: "",
       website: "",
       email: "",
       contact: "",
       isDefault: false,
-      soporte1: "",
-      soporte2: "",
-      soporte3: "",
-      data_usaweb: false,
-      data_servidor: "",
-      data_usuario: "",
-      data_password: "",
-      data_port: "",
-      licencia: "",
-      historizada: false,
-      masinfo: "",
-      usa_prefijo: false,
-      name_prefijo: "",
-      dprefijobd: "",
-      dprefijosrv: "",
-      dprefijousr: "",
+      support1: "",
+      support2: "",
+      support3: "",
+      usesWeb: false,
+      dbServer: "",
+      dbUser: "",
+      dbPassword: "",
+      dbPort: "",
+      license: "",
+      archived: false,
+      additionalInfo: "",
+      usesPrefix: false,
+      prefixName: "",
+      dbPrefix: "",
+      serverPrefix: "",
+      userPrefix: "",
     },
   });
 
@@ -89,28 +89,28 @@ const EmpresaForm = ({
         address: empresa.address || "",
         phones: empresa.phones || "",
         fax: empresa.fax || "",
-        numerorif: empresa.numerorif || "",
-        numeronit: empresa.numeronit || "",
+        rif: empresa.rif || "",
+        nit: empresa.nit || "",
         website: empresa.website || "",
         email: empresa.email || "",
         contact: empresa.contact || "",
         isDefault: empresa.isDefault,
-        soporte1: empresa.soporte1 || "",
-        soporte2: empresa.soporte2 || "",
-        soporte3: empresa.soporte3 || "",
-        data_usaweb: empresa.data_usaweb,
-        data_servidor: empresa.data_servidor || "",
-        data_usuario: empresa.data_usuario || "",
-        data_password: empresa.data_password || "",
-        data_port: empresa.data_port || "",
-        licencia: empresa.licencia || "",
-        historizada: empresa.historizada,
-        masinfo: empresa.masinfo || "",
-        usa_prefijo: empresa.usa_prefijo,
-        name_prefijo: empresa.name_prefijo || "",
-        dprefijobd: empresa.dprefijobd || "",
-        dprefijosrv: empresa.dprefijosrv || "",
-        dprefijousr: empresa.dprefijousr || "",
+        support1: empresa.support1 || "",
+        support2: empresa.support2 || "",
+        support3: empresa.support3 || "",
+        usesWeb: empresa.usesWeb,
+        dbServer: empresa.dbServer || "",
+        dbUser: empresa.dbUser || "",
+        dbPassword: empresa.dbPassword || "",
+        dbPort: empresa.dbPort || "",
+        license: empresa.license || "",
+        archived: empresa.archived,
+        additionalInfo: empresa.additionalInfo || "",
+        usesPrefix: empresa.usesPrefix,
+        prefixName: empresa.prefixName || "",
+        dbPrefix: empresa.dbPrefix || "",
+        serverPrefix: empresa.serverPrefix || "",
+        userPrefix: empresa.userPrefix || "",
       });
       setPreviewUrl(empresa.logoUrl || null);
     } else {
@@ -119,28 +119,28 @@ const EmpresaForm = ({
         address: "",
         phones: "",
         fax: "",
-        numerorif: "",
-        numeronit: "",
+        rif: "",
+        nit: "",
         website: "",
         email: "",
         contact: "",
         isDefault: false,
-        soporte1: "",
-        soporte2: "",
-        soporte3: "",
-        data_usaweb: false,
-        data_servidor: "",
-        data_usuario: "",
-        data_password: "",
-        data_port: "",
-        licencia: "",
-        historizada: false,
-        masinfo: "",
-        usa_prefijo: false,
-        name_prefijo: "",
-        dprefijobd: "",
-        dprefijosrv: "",
-        dprefijousr: "",
+        support1: "",
+        support2: "",
+        support3: "",
+        usesWeb: false,
+        dbServer: "",
+        dbUser: "",
+        dbPassword: "",
+        dbPort: "",
+        license: "",
+        archived: false,
+        additionalInfo: "",
+        usesPrefix: false,
+        prefixName: "",
+        dbPrefix: "",
+        serverPrefix: "",
+        userPrefix: "",
       });
     }
     setIsLoading(false);
@@ -307,26 +307,26 @@ const EmpresaForm = ({
 
                 <div className="field mb-4 col-12">
                   <label
-                    htmlFor="numerorif"
+                    htmlFor="rif"
                     className="block text-900 font-medium mb-2"
                   >
                     Número RIF <span className="text-red-500">*</span>
                   </label>
                   <Controller
-                    name="numerorif"
+                    name="rif"
                     control={control}
                     render={({ field }) => (
                       <RifInput
-                        id="numerorif"
+                        id="rif"
                         value={field.value}
                         onChange={field.onChange}
-                        error={errors.numerorif}
+                        error={errors.rif}
                       />
                     )}
                   />
-                  {errors.numerorif && (
+                  {errors.rif && (
                     <small className="p-error block mt-1">
-                      {errors.numerorif.message}
+                      {errors.rif.message}
                     </small>
                   )}
                 </div>
@@ -360,18 +360,18 @@ const EmpresaForm = ({
               )}
             </div>
             <div className="field mb-4 col-12 md:col-6">
-              <label htmlFor="name_prefijo" className="font-medium text-900">
+              <label htmlFor="prefixName" className="font-medium text-900">
                 Nombre del Prefijo
               </label>
               <InputText
-                id="name_prefijo"
+                id="prefixName"
                 className={classNames("w-full", {
-                  "p-invalid": errors.name_prefijo,
+                  "p-invalid": errors.prefixName,
                 })}
-                {...register("name_prefijo")}
+                {...register("prefixName")}
               />
-              {errors.name_prefijo && (
-                <small className="p-error">{errors.name_prefijo.message}</small>
+              {errors.prefixName && (
+                <small className="p-error">{errors.prefixName.message}</small>
               )}
             </div>
             {/* Información de Contacto */}

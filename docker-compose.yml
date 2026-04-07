@@ -5,7 +5,7 @@ services:
     container_name: mi_backend_nomisys
     restart: always
     ports:
-      - "4000:4000"
+      - "4001:4000"
     environment:
       # Forzamos a producción y le pasamos todas sus variables
       - NODE_ENV=production
@@ -33,7 +33,7 @@ services:
     container_name: mi_frontend_nomisys
     restart: always
     ports:
-      - "3005:3000"
+      - "3006:3000"
     depends_on:
       - api-backend
     environment:
