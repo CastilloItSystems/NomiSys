@@ -37,4 +37,4 @@ jobs:
           # ⚠️ CAMBIA "tu_usuario" POR TU USUARIO DE GITHUB (TODO EN MINÚSCULAS)
           tags: ghcr.io/castilloitsystems/nomisys-frontend:latest
           build-args: |
-            NEXT_PUBLIC_API_BASE_URL=https://api-autosys.castilloitsystems.com/api
+            NEXT_PUBLIC_API_BASE_URL=https://api-nomisys.castilloitsystems.com/api
