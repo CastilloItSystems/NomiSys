@@ -7,7 +7,7 @@ export interface NotificationResponse {
 }
 export const useNotifications = (
   userId: string,
-  notification?: Notification
+  notification?: Notification,
 ) => {
   const [loading, setLoading] = useState(true);
   const [notifications, setNotifications] = useState<NotificationResponse>({
@@ -37,7 +37,7 @@ export const useNotifications = (
     if (notification) {
       setNotifications((prevNotifications) => {
         const index = prevNotifications.notifications.findIndex(
-          (notif) => notif._id === notification._id
+          (notif) => notif._id === notification._id,
         );
         if (index !== -1) {
           // Si la notificación ya existe, actualízala

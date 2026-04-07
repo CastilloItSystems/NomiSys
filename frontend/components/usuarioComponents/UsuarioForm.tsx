@@ -93,11 +93,11 @@ const accesoValues = [
 ];
 
 const departamentoValues = [
-  { label: "Ventas", value: "ventas" },
-  { label: "Inventario", value: "inventario" },
-  { label: "Administración", value: "administracion" },
-  { label: "Servicios", value: "servicios" },
-  { label: "Gerencia", value: "gerencia" },
+  { label: "Ventas", value: "sales" },
+  { label: "Inventario", value: "inventory" },
+  { label: "Administración", value: "administration" },
+  { label: "Servicios", value: "services" },
+  { label: "Gerencia", value: "management" },
 ];
 
 const UsuarioForm = ({

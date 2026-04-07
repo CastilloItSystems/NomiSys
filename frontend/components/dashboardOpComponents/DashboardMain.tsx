@@ -131,10 +131,10 @@ const DashboardMain = () => {
                       {empresa.direccion}
                     </span> */}
                     <span className="text-primary block text-2xl md:text-3xl font-bold mb-1">
-                      {empresa.name_prefijo}
+                      {empresa.prefixName}
                     </span>
                     <span className="text-primary block white-space-nowrap text-xs opacity-70">
-                      {empresa.numerorif}
+                      {empresa.rif}
                     </span>
                   </div>
                 </div>

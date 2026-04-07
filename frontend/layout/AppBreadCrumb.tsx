@@ -37,10 +37,8 @@ const AppBreadcrumb = (props: AppBreadcrumbProps) => {
           pathname !== "/dashboard-sales" ? (
             breadcrumb?.labels?.map((label, index) => {
               const displayLabel =
-                index === 0 &&
-                label === "Empresa" &&
-                activeEmpresa?.name_prefijo
-                  ? activeEmpresa.name_prefijo
+                index === 0 && label === "Empresa" && activeEmpresa?.prefixName
+                  ? activeEmpresa.prefixName
                   : label;
               return (
                 <React.Fragment key={index}>
@@ -50,8 +48,7 @@ const AppBreadcrumb = (props: AppBreadcrumbProps) => {
                   <li
                     key={index}
                     className={
-                      index === 0 &&
-                      displayLabel === activeEmpresa?.name_prefijo
+                      index === 0 && displayLabel === activeEmpresa?.prefixName
                         ? "font-bold text-primary"
                         : ""
                     }
@@ -64,12 +61,11 @@ const AppBreadcrumb = (props: AppBreadcrumbProps) => {
           ) : (
             <>
               {pathname === "/" && <li key={"home"}>Centro de Operaciones</li>}
-              {pathname.startsWith("/empresa") &&
-                activeEmpresa?.name_prefijo && (
-                  <li key={"empresa"} className="font-bold text-primary">
-                    {activeEmpresa.name_prefijo}
-                  </li>
-                )}
+              {pathname.startsWith("/empresa") && activeEmpresa?.prefixName && (
+                <li key={"empresa"} className="font-bold text-primary">
+                  {activeEmpresa.prefixName}
+                </li>
+              )}
               {pathname === "/dashboard-sales" && (
                 <li key={"banking"}>Sales Dashboard</li>
               )}

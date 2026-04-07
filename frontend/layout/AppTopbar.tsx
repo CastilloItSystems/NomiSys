@@ -16,9 +16,9 @@ import { classNames } from "primereact/utils";
 import { signOut, useSession } from "next-auth/react";
 import { User } from "next-auth";
 import { useSocket } from "@/hooks/useSocket";
-import { useRefineriaStore } from "@/store/refineriaStore";
 import AppNotificationDropdown from "./AppNotificationDropdown";
 import { Dialog } from "primereact/dialog";
+import { useEmpresasStore } from "@/store/empresasStore";
 
 interface ExtendedUser extends User {
   usuario: {
@@ -31,10 +31,8 @@ interface ExtendedUser extends User {
 
 const AppTopbar = forwardRef<AppTopbarRef>((props, ref) => {
   const { data: session } = useSession();
-  const { activeRefineria } = useRefineriaStore();
-  console.log("sersion", session);
   const { online, desconectarSocket } = useSocket();
-
+  const { activeEmpresa } = useEmpresasStore();
   const handleSignOut = async () => {
     // Revoca el token de Google si existe
     const accessToken = session?.user?.access_token;
@@ -145,14 +143,13 @@ const AppTopbar = forwardRef<AppTopbarRef>((props, ref) => {
         })}
         {!tabs ||
           (tabs.length === 0 &&
-            (pathname.startsWith("/refineria") ||
-              pathname.startsWith("/bunkering")) &&
-            activeRefineria && (
+            pathname.startsWith("/empresa") &&
+            activeEmpresa && (
               // <li className="topbar-menu-empty ">
 
-              <Link href={"/refineria"} className="app-logo">
-                <img alt="app logo" src={activeRefineria.img} />
-                <span className="app-name">{activeRefineria.nombre}</span>
+              <Link href={"/empresa"} className="app-logo">
+                <img alt="app logo" src={activeEmpresa.logoUrl} />
+                <span className="app-name">{activeEmpresa.prefixName}</span>
               </Link>
               // </li>
             ))}

@@ -20,7 +20,7 @@ const fetcher = async () => {
   );
 
   return {
-    empresas: empresasDB?.empresas || [],
+    empresas: empresasDB?.companies || [],
   };
 };
 

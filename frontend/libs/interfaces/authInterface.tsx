@@ -1,12 +1,3 @@
-import { NomiSys } from "./autoSysInterface";
-import {
-  HistorialCambio,
-  Refineria,
-  UserReference,
-} from "./configRefineriaInterface";
-import { Empresa } from "./empresaInterface";
-import { Workshop } from "./workshopInterface";
-
 export interface AuthContextProps {
   children: React.ReactNode;
 }
@@ -29,29 +20,6 @@ export interface UserEmpresaRoleInfo {
   company: { id: string; name: string };
   role: { id: string; name: string; permissions: string[] };
 }
-
-// export interface Usuario {
-//   id: string;
-//   nombre: string;
-//   correo: string;
-//   rol?: string; // campo legacy — se mantiene durante transición
-//   acceso: string;
-//   estado: string;
-//   createdBy: UserReference;
-//   modificadoPor: UserReference;
-//   createdAt: string;
-//   historial: HistorialCambio[];
-//   idWorkshop?: Workshop[];
-//   idRefineria?: Refineria[];
-//   idNomiSys?: NomiSys[];
-//   empresas?: Empresa[];
-//   userEmpresaRoles?: UserEmpresaRoleInfo[]; // NEW: roles dinámicos por empresa
-
-//   departamento?: string[];
-
-//   img?: string;
-//   telefono: string;
-// }
 export interface MembershipRole {
   id: string;
   name: string;

@@ -1,6 +1,5 @@
 import React, { useRef, useState } from "react";
 import { useNotifications } from "@/hooks/useNotifications";
-import { useStockAlerts } from "@/hooks/useStockAlerts";
 import { StyleClass } from "primereact/styleclass";
 import { Ripple } from "primereact/ripple";
 import { Badge } from "primereact/badge";
@@ -22,7 +21,6 @@ const AppNotificationDropdown = ({ session }: AppNotificationDropdownProps) => {
     session?.user?.id,
     notification || undefined,
   );
-  const { alerts: stockAlerts, loading: stockLoading } = useStockAlerts(true);
   const [activeTab, setActiveTab] = useState<number>(0);
 
   const { total = 0, notifications: notificaciones = [] } = notifications || {};
@@ -61,7 +59,6 @@ const AppNotificationDropdown = ({ session }: AppNotificationDropdownProps) => {
   };
 
   const unreadCount = notificaciones.filter((n) => !n.read).length;
-  const totalUnread = unreadCount + stockAlerts.total;
 
   return (
     <div className="topbar-notifications ">
@@ -84,13 +81,6 @@ const AppNotificationDropdown = ({ session }: AppNotificationDropdownProps) => {
               className="pi pi-bell text-indigo-700"
               style={{ fontSize: "1.5rem" }}
             ></i>
-            {totalUnread > 0 && (
-              <Badge
-                value={totalUnread}
-                severity="danger"
-                className="absolute top-0 right-0 -mt-1 -mr-1"
-              ></Badge>
-            )}
           </div>
         </button>
       </StyleClass>
@@ -224,91 +214,6 @@ const AppNotificationDropdown = ({ session }: AppNotificationDropdownProps) => {
                     <span className="text-600 mt-2">No hay notificaciones</span>
                     <p className="text-500 text-center mt-1">
                       Cuando tengas nuevas notificaciones, aparecerán aquí.
-                    </p>
-                  </div>
-                )}
-              </div>
-            </TabPanel>
-
-            <TabPanel
-              header={`Stock Alerts (${stockAlerts.total})`}
-              leftIcon="pi pi-exclamation-circle"
-            >
-              <div className="overflow-y-auto" style={{ maxHeight: "60vh" }}>
-                {stockLoading ? (
-                  <div className="p-5 flex flex-column align-items-center justify-content-center">
-                    <ProgressSpinner
-                      style={{ width: "50px", height: "50px" }}
-                      strokeWidth="4"
-                      animationDuration=".5s"
-                    />
-                    <span className="mt-3 text-600">Cargando alertas...</span>
-                  </div>
-                ) : stockAlerts.alerts.length > 0 ? (
-                  stockAlerts.alerts.map((alert, index) => (
-                    <div
-                      key={index}
-                      className="p-ripple border-bottom-1 surface-border p-3 flex flex-column align-items-start hover:surface-hover transition-colors transition-duration-150"
-                    >
-                      <div className="flex align-items-start w-full justify-content-between">
-                        <div className="flex align-items-center gap-3 flex-1">
-                          <Avatar
-                            icon={`pi ${
-                              alert.severity === "CRITICAL"
-                                ? "pi-times-circle"
-                                : alert.severity === "MEDIUM"
-                                ? "pi-exclamation-triangle"
-                                : "pi-info-circle"
-                            }`}
-                            size="large"
-                            shape="circle"
-                            className={`${
-                              alert.severity === "CRITICAL"
-                                ? "bg-red-100"
-                                : alert.severity === "MEDIUM"
-                                ? "bg-yellow-100"
-                                : "bg-blue-100"
-                            }`}
-                          />
-                          <div className="flex-1">
-                            <div className="font-bold text-900">
-                              {alert.message}
-                            </div>
-                            <div className="text-600 text-sm">
-                              Type: {alert.type}
-                            </div>
-                            <div className="flex align-items-center gap-2 mt-2">
-                              <Tag
-                                value={alert.severity}
-                                severity={
-                                  alert.severity === "CRITICAL"
-                                    ? "danger"
-                                    : alert.severity === "MEDIUM"
-                                    ? "warning"
-                                    : "info"
-                                }
-                                className="py-1"
-                              />
-                              <span className="text-500 text-xs">
-                                <i className="pi pi-clock mr-1"></i>
-                                {timeAgo(alert.createdAt)}
-                              </span>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                      <Ripple />
-                    </div>
-                  ))
-                ) : (
-                  <div className="p-5 flex flex-column align-items-center justify-content-center">
-                    <i
-                      className="pi pi-inbox text-400"
-                      style={{ fontSize: "3rem" }}
-                    ></i>
-                    <span className="text-600 mt-2">Sin alertas activas</span>
-                    <p className="text-500 text-center mt-1">
-                      Tu inventario está en buen estado
                     </p>
                   </div>
                 )}
