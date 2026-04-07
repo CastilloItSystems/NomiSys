@@ -31,9 +31,7 @@ const DashboardMain = () => {
       return empresas;
     } else if (acceso === "limited" && Array.isArray(userEmpresas)) {
       return empresas.filter((w: any) =>
-        userEmpresas.some(
-          (userEmpresa: any) => userEmpresa.empresaId === w.id,
-        ),
+        userEmpresas.some((userEmpresa: any) => userEmpresa.empresaId === w.id),
       );
     } else {
       return [];

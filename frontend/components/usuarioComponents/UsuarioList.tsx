@@ -243,9 +243,7 @@ const UsuarioList = () => {
       <div className="flex flex-column gap-1">
         {memberships.map((membership) => (
           <div key={membership.id} className="text-sm">
-            <strong>
-              {membership.empresa?.name ?? membership.empresaId}
-            </strong>
+            <strong>{membership.empresa?.name ?? membership.empresaId}</strong>
             {membership.role?.name ? ` — ${membership.role.name}` : ""}
           </div>
         ))}

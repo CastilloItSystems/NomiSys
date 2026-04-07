@@ -27,11 +27,14 @@ const handler = NextAuth({
       authorize: async (credentials) => {
         if (!credentials) return null;
         try {
-          const correo = (credentials as any).email ?? (credentials as any).correo
-          const password = (credentials as any).password
+          const correo =
+            (credentials as any).email ?? (credentials as any).correo;
+          const password = (credentials as any).password;
           if (!correo || !password) {
-            console.warn('Credentials missing email or password', { credentials })
-            return null
+            console.warn("Credentials missing email or password", {
+              credentials,
+            });
+            return null;
           }
           const response = await loginUser({
             email: correo,

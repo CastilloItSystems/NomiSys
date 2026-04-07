@@ -236,9 +236,7 @@ const UsuarioForm = ({
             )}
           />
           {errors.name && (
-            <small className="p-error block mt-1">
-              {errors.name.message}
-            </small>
+            <small className="p-error block mt-1">{errors.name.message}</small>
           )}
         </div>
 
@@ -260,9 +258,7 @@ const UsuarioForm = ({
             )}
           />
           {errors.email && (
-            <small className="p-error block mt-1">
-              {errors.email.message}
-            </small>
+            <small className="p-error block mt-1">{errors.email.message}</small>
           )}
         </div>
 
@@ -285,9 +281,7 @@ const UsuarioForm = ({
             )}
           />
           {errors.phone && (
-            <small className="p-error block mt-1">
-              {errors.phone.message}
-            </small>
+            <small className="p-error block mt-1">{errors.phone.message}</small>
           )}
         </div>
 
