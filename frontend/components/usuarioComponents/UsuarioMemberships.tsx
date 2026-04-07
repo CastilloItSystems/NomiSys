@@ -240,7 +240,7 @@ const UsuarioMemberships = ({
         >
           <Column
             header="Empresa"
-            body={(m: Membership) => m.empresa?.nombre ?? m.empresaId}
+            body={(m: Membership) => m.empresa?.name ?? m.empresaId}
           />
           <Column
             header="Rol"
@@ -308,7 +308,7 @@ const UsuarioMemberships = ({
             <span>
               ¿Eliminar la membership de{" "}
               <b>
-                {selectedMembership.empresa?.nombre ??
+                {selectedMembership.empresa?.name ??
                   selectedMembership.empresaId}
               </b>
               ?
@@ -327,7 +327,7 @@ const UsuarioMemberships = ({
           }}
           membershipId={selectedPermMembership.id}
           membershipLabel={`${userName} — ${
-            selectedPermMembership.empresa?.nombre ??
+            selectedPermMembership.empresa?.name ??
             selectedPermMembership.empresaId
           }`}
           toast={toast}

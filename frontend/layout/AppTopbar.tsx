@@ -187,7 +187,7 @@ const AppTopbar = forwardRef<AppTopbarRef>((props, ref) => {
             />
 
             <span className="profile-details">
-              <span className="profile-name">{session?.user?.nombre}</span>
+              <span className="profile-name">{session?.user?.name}</span>
               <span className="profile-job">
                 {session?.user?.empresas
                   ?.map((e) => e.role?.name?.toLowerCase())

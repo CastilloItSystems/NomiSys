@@ -78,7 +78,7 @@ const UsuarioChangePasswordForm = ({
       toast.current?.show({
         severity: "success",
         summary: "Éxito",
-        detail: `Contraseña actualizada para ${usuario.nombre}`,
+        detail: `Contraseña actualizada para ${usuario.name}`,
       });
 
       reset();

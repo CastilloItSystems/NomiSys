@@ -18,7 +18,7 @@ const MyProfileList: React.FC = () => {
   const profile = session?.user;
   const toast = useRef<Toast>(null);
   const [usuarioFormDialog, setMyprofileFormDialog] = useState(false);
-  const [name, setName] = useState(profile?.nombre || "");
+  const [name, setName] = useState(profile?.name || "");
   const [avatar, setAvatar] = useState(
     profile?.img ||
       "https://primefaces.org/cdn/primevue/images/avatar/amyelsner.png",
@@ -90,7 +90,7 @@ const MyProfileList: React.FC = () => {
   };
   useEffect(() => {
     if (profile) {
-      setName(profile.nombre || "");
+      setName(profile.name || "");
       if (profile.img) {
         setAvatar(profile.img);
       }
@@ -125,18 +125,18 @@ const MyProfileList: React.FC = () => {
                   >
                     <Tag
                       severity={
-                        profile?.estado === "activo" ? "success" : "danger"
+                        profile?.status === "active" ? "success" : "danger"
                       }
                       className="px-1 py-1 text-sm flex align-items-center gap-2 border-round-2xl shadow-2"
                     >
                       <i
                         className={
-                          profile?.estado === "activo"
+                          profile?.status === "active"
                             ? "pi pi-check-circle"
                             : "pi pi-exclamation-triangle"
                         }
                       />
-                      {profile?.estado === "activo" ? "Activo" : "Inactivo"}
+                      {profile?.status === "active" ? "Activo" : "Inactivo"}
                     </Tag>
                   </span>
                 )}
@@ -243,7 +243,7 @@ const MyProfileList: React.FC = () => {
                       className="text-900 font-semibold text-sm lg:text-lg overflow-hidden text-overflow-ellipsis white-space-nowrap block"
                       style={{ maxWidth: "100%" }}
                     >
-                      {profile?.correo}
+                      {profile?.email}
                     </span>
                   </div>
                   <Tooltip
@@ -280,7 +280,7 @@ const MyProfileList: React.FC = () => {
                   >
                     <i className="pi pi-phone text-primary text-xl" />
                     <span className="text-900 font-semibold text-lg">
-                      {profile?.telefono || "-"}
+                      {profile?.phone || "-"}
                     </span>
                   </div>
                   <Tooltip
@@ -298,10 +298,10 @@ const MyProfileList: React.FC = () => {
                   >
                     <i className="pi pi-building text-primary text-xl" />
                     <div className="flex flex-wrap gap-2">
-                      {profile?.departamento &&
-                      Array.isArray(profile.departamento) &&
-                      profile.departamento.length > 0 ? (
-                        profile.departamento.map((dep, idx) => (
+                      {profile?.departments &&
+                      Array.isArray(profile.departments) &&
+                      profile.departments.length > 0 ? (
+                        profile.departments.map((dep, idx) => (
                           <span
                             key={idx}
                             className="p-tag p-tag-rounded bg-primary text-white border-none px-3 py-1"
@@ -333,7 +333,7 @@ const MyProfileList: React.FC = () => {
                   >
                     <i className="pi pi-key text-primary text-xl" />
                     <span className="text-900 font-semibold text-lg">
-                      {profile?.acceso || "-"}
+                      {profile?.access || "-"}
                     </span>
                   </div>
                   <Tooltip
@@ -358,9 +358,9 @@ const MyProfileList: React.FC = () => {
                             <span
                               key={idx}
                               className="p-tag p-tag-rounded bg-primary text-white border-none px-3 py-1"
-                              title={empresa.nombre}
+                              title={empresa.name}
                             >
-                              {empresa.nombre}
+                              {empresa.name}
                             </span>
                           ))}
                         </div>

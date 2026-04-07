@@ -52,9 +52,9 @@ const MyprofileForm = ({
 
   useEffect(() => {
     if (usuario) {
-      if (usuario.nombre !== undefined) setValue("nombre", usuario.nombre);
-      if (usuario.telefono !== undefined && usuario.telefono !== null)
-        setValue("telefono", usuario.telefono);
+      if (usuario.name !== undefined) setValue("name", usuario.name);
+      if (usuario.phone !== undefined && usuario.phone !== null)
+        setValue("phone", usuario.phone);
       setPreviewUrl(usuario.img || null);
     }
   }, [usuario, setValue]);
@@ -100,8 +100,8 @@ const MyprofileForm = ({
 
       await update({
         updatedUsuario: {
-          nombre: usuarioActualizado.nombre,
-          telefono: usuarioActualizado.telefono,
+          name: usuarioActualizado.name,
+          phone: usuarioActualizado.phone,
           img: finalImg,
         },
       });
@@ -158,29 +158,29 @@ const MyprofileForm = ({
         </div>
 
         <div className="field mb-4 col-12 md:col-8">
-          <label htmlFor="nombre" className="font-medium text-900">
+          <label htmlFor="name" className="font-medium text-900">
             Nombre
           </label>
           <InputText
-            id="nombre"
+            id="name"
             type="text"
-            className={classNames("w-full", { "p-invalid": errors.nombre })}
-            {...register("nombre")}
+            className={classNames("w-full", { "p-invalid": errors.name })}
+            {...register("name")}
           />
-          {errors.nombre && (
-            <small className="p-error">{errors.nombre.message}</small>
+          {errors.name && (
+            <small className="p-error">{errors.name.message}</small>
           )}
         </div>
 
         <div className="field mb-4 col-12 md:col-4">
           <label className="block font-medium text-900 mb-2">Teléfono</label>
           <Controller
-            name="telefono"
+            name="phone"
             control={control}
             render={({ field, fieldState }) => (
               <>
                 <PhoneInput
-                  id="telefono"
+                  id="phone"
                   value={field.value}
                   onChange={field.onChange}
                   error={fieldState.error}

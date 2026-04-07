@@ -204,30 +204,30 @@ const UsuarioList = () => {
       string,
       "success" | "warning" | "danger" | "info"
     > = {
-      activo: "success",
-      pendiente: "warning",
-      suspendido: "danger",
+      active: "success",
+      pending: "warning",
+      suspended: "danger",
     };
 
     return (
       <Tag
-        value={rowData.estado}
-        severity={severityMap[rowData.estado] || "info"}
+        value={rowData.status}
+        severity={severityMap[rowData.status] || "info"}
       />
     );
   };
 
   const accesoBodyTemplate = (rowData: User) => {
     const severityMap: Record<string, "success" | "warning" | "secondary"> = {
-      completo: "success",
-      limitado: "warning",
-      ninguno: "secondary",
+      full: "success",
+      limited: "warning",
+      none: "secondary",
     };
 
     return (
       <Tag
-        value={rowData.acceso}
-        severity={severityMap[rowData.acceso] || "secondary"}
+        value={rowData.access}
+        severity={severityMap[rowData.access] || "secondary"}
       />
     );
   };
@@ -244,7 +244,7 @@ const UsuarioList = () => {
         {memberships.map((membership) => (
           <div key={membership.id} className="text-sm">
             <strong>
-              {membership.company?.name ?? membership.empresaId}
+              {membership.empresa?.name ?? membership.empresaId}
             </strong>
             {membership.role?.name ? ` — ${membership.role.name}` : ""}
           </div>
@@ -503,7 +503,7 @@ const UsuarioList = () => {
             setSelectedMembershipUser(null);
           }}
           userId={selectedMembershipUser.id}
-          userName={selectedMembershipUser.nombre}
+          userName={selectedMembershipUser.name}
           toast={toast}
         />
       )}

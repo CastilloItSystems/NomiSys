@@ -83,8 +83,8 @@ const handler = NextAuth({
           ...(typeof token.user === "object" && token.user !== null
             ? token.user
             : {}),
-          nombre: session.updatedUsuario.nombre,
-          telefono: session.updatedUsuario.telefono,
+          name: session.updatedUsuario.name,
+          phone: session.updatedUsuario.phone,
         };
       }
       if (account?.provider === "google") {
