@@ -70,61 +70,22 @@ export interface AuditLogsResponse {
 
 export interface CreateEmpresaRequest {
   name: string;
-  address?: string;
-  phones?: string;
-  fax?: string;
-  numerorif?: string;
-  numeronit?: string;
-  website?: string;
-  email?: string;
-  contact?: string;
+  address?: string | null;
+  phones?: string | null;
+  email?: string | null;
+  contact?: string | null;
   isDefault?: boolean;
-  soporte1?: string;
-  soporte2?: string;
-  soporte3?: string;
-  data_usaweb?: boolean;
-  data_servidor?: string;
-  data_usuario?: string;
-  data_password?: string;
-  data_port?: string;
-  licencia?: string;
-  historizada?: boolean;
-  masinfo?: string;
-  usa_prefijo?: boolean;
-  name_prefijo?: string;
-  dprefijobd?: string;
-  dprefijosrv?: string;
-  dprefijousr?: string;
-  logoUrl?: string;
+  logoUrl?: string | null;
 }
 
 export interface UpdateEmpresaRequest {
   name?: string;
   address?: string | null;
   phones?: string | null;
-  fax?: string | null;
-  numerorif?: string | null;
-  numeronit?: string | null;
-  website?: string | null;
   email?: string | null;
   contact?: string | null;
   isDefault?: boolean;
-  soporte1?: string | null;
-  soporte2?: string | null;
-  soporte3?: string | null;
-  data_usaweb?: boolean;
-  data_servidor?: string | null;
-  data_usuario?: string | null;
-  data_password?: string | null;
-  data_port?: string | null;
-  licencia?: string | null;
-  historizada?: boolean;
-  masinfo?: string | null;
-  usa_prefijo?: boolean;
-  name_prefijo?: string | null;
-  dprefijobd?: string | null;
-  dprefijosrv?: string | null;
-  dprefijousr?: string | null;
+  logoUrl?: string | null;
   deleted?: boolean;
 }
 
@@ -132,32 +93,36 @@ export interface UpdateEmpresaRequest {
 
 export const getEmpresa = async (id: string): Promise<Empresa> => {
   const response = await apiClient.get(`/companies/${id}`);
-  return response.data;
+  return response.data.data;
 };
 
 export const getEmpresas = async (): Promise<EmpresasResponse> => {
   const response = await apiClient.get("/companies");
-  return response.data;
+  return response.data.data;
 };
 
 export const getEmpresaPredeterminada = async (): Promise<Empresa> => {
   const response = await apiClient.get("/companies/default");
-  return response.data;
+  return response.data.data;
 };
 
 export const createEmpresa = async (
   data: CreateEmpresaRequest,
 ): Promise<Empresa> => {
-  const response = await apiClient.post("/companies", data);
-  return response.data;
+  const { name, address, phones, email, contact, isDefault, logoUrl } = data;
+  const payload = { name, address: address || null, phones: phones || null, email: email || null, contact: contact || null, isDefault, logoUrl };
+  const response = await apiClient.post("/companies", payload);
+  return response.data.data;
 };
 
 export const updateEmpresa = async (
   id: string,
   data: UpdateEmpresaRequest,
 ): Promise<Empresa> => {
-  const response = await apiClient.put(`/companies/${id}`, data);
-  return response.data;
+  const { name, address, phones, email, contact, isDefault, logoUrl, deleted } = data;
+  const payload = { name, address: address || null, phones: phones || null, email: email || null, contact: contact || null, isDefault, logoUrl, deleted };
+  const response = await apiClient.put(`/companies/${id}`, payload);
+  return response.data.data;
 };
 
 export const uploadEmpresaLogo = async (
@@ -175,7 +140,7 @@ export const uploadEmpresaLogo = async (
       },
     },
   );
-  return response.data;
+  return (response.data as any).data ?? response.data;
 };
 
 export const deleteEmpresa = async (
@@ -189,5 +154,5 @@ export const getAuditLogsForEmpresa = async (
   id: string,
 ): Promise<AuditLogsResponse> => {
   const response = await apiClient.get(`/companies/${id}/audit-logs`);
-  return response.data;
+  return response.data.data;
 };

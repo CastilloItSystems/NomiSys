@@ -68,14 +68,14 @@ const EmpresasList = () => {
   const normalizeEmpresa = (e: any): Empresa => {
     return {
       ...e,
-      direccion: e.direccion ?? undefined,
-      telefonos: e.telefonos ?? undefined,
+      address: e.address ?? undefined,
+      phones: e.phones ?? undefined,
       fax: e.fax ?? undefined,
       numerorif: e.numerorif ?? undefined,
       numeronit: e.numeronit ?? undefined,
       website: e.website ?? undefined,
       email: e.email ?? undefined,
-      contacto: e.contacto ?? undefined,
+      contact: e.contact ?? undefined,
       soporte1: e.soporte1 ?? undefined,
       soporte2: e.soporte2 ?? undefined,
       soporte3: e.soporte3 ?? undefined,
@@ -96,9 +96,8 @@ const EmpresasList = () => {
     try {
       setLoading(true);
       const empresasDB = await getEmpresas();
-      // Ajuste según la respuesta de tu backend: normalizamos null -> undefined
-      const raw = (empresasDB?.companies ?? empresasDB) || [];
-      const normalized = (Array.isArray(raw) ? raw : []).map(normalizeEmpresa);
+      const raw = empresasDB?.data.companies ?? [];
+      const normalized = raw.map(normalizeEmpresa);
       setEmpresas(normalized);
     } catch (error) {
       console.error("Error cargando empresas:", error);
@@ -306,9 +305,9 @@ const EmpresasList = () => {
           rowsPerPageOptions={[10, 25, 50]}
           filters={filters}
           globalFilterFields={[
-            "nombre",
+            "name",
             "numerorif",
-            "direccion",
+            "address",
             "email",
             "name_prefijo",
           ]}
@@ -317,7 +316,7 @@ const EmpresasList = () => {
           size="small"
         >
           <Column
-            field="nombre"
+            field="name"
             header="Nombre"
             sortable
             style={{ minWidth: "200px" }}
@@ -329,7 +328,7 @@ const EmpresasList = () => {
             style={{ minWidth: "120px" }}
           ></Column>
           <Column
-            field="direccion"
+            field="address"
             header="Dirección"
             sortable
             style={{ minWidth: "250px" }}
@@ -341,7 +340,7 @@ const EmpresasList = () => {
             style={{ minWidth: "150px" }}
           ></Column>
           <Column
-            field="telefonos"
+            field="phones"
             header="Teléfonos"
             sortable
             style={{ minWidth: "150px" }}
@@ -353,13 +352,13 @@ const EmpresasList = () => {
             style={{ minWidth: "200px" }}
           ></Column>
           <Column
-            field="predeter"
+            field="isDefault"
             header="Predet."
             sortable
             body={(rowData) => (
               <i
                 className={`pi ${
-                  rowData.predeter
+                  rowData.isDefault
                     ? "pi-check-circle text-green-500"
                     : "pi-circle text-gray-400"
                 }`}
