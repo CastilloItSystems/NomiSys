@@ -1,0 +1,37 @@
+enum UserStatus {
+  pending
+  active
+  suspended
+}
+
+enum Access {
+  limited
+  full
+  none
+}
+
+model User {
+  id            String       @id @default(cuid())
+  img           String?
+  name          String
+  email         String       @unique
+  phone         String?
+  password      String
+  departments   String[]
+  access        Access       @default(none)
+  status        UserStatus   @default(active)
+  deleted       Boolean      @default(false)
+  online        Boolean      @default(false)
+  fcmTokens     String[]
+  google        Boolean      @default(false)
+  isTechnician  Boolean      @default(false)
+  createdAt     DateTime     @default(now())
+  updatedAt     DateTime     @updatedAt
+
+  auditLogs     AuditLog[]
+  memberships   Membership[]
+
+  @@index([deleted])
+  @@index([status])
+  @@index([name])
+}

@@ -1,0 +1,19 @@
+model Company {
+  id              String       @id @default(cuid())
+  name            String
+  address         String?
+  phones          String?
+  email           String?
+  contact         String?
+  deleted         Boolean      @default(false)
+  logoUrl         String?      @map("logo_url")
+  isDefault       Boolean      @default(false)
+
+  memberships     Membership[]
+  companyRoles    CompanyRole[]
+
+  createdAt       DateTime     @default(now())
+  updatedAt       DateTime     @updatedAt
+
+  @@map("Company")
+}

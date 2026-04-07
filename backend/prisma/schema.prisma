@@ -1,0 +1,197 @@
+//******** AUTO GENERATED FILE, DO NOT EDIT.  *********
+
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+
+model AuditLog {
+  id        String   @id @default(cuid())
+  entity    String   // Nombre de la tabla (Ej: "User", "Empresa")
+  entityId  String   // ID del registro afectado
+  action    String   // "CREATE", "UPDATE", "DELETE", etc.
+  
+  userId    String?  // Usuario que realizó la acción
+  user      User?    @relation(fields: [userId], references: [id])
+  
+  changes   Json     // Guardará el estado anterior y nuevo: { before: {...}, after: {...} }
+  metadata  Json?    // Para guardar IP, navegador, etc.
+  
+  createdAt DateTime @default(now())
+
+  @@index([entity, entityId]) // Búsqueda rápida por registro
+  @@index([userId])           // Búsqueda rápida por usuario
+}
+
+
+model CompanyRole {
+  id              String            @id @default(cuid())
+  name            String
+  description     String?
+
+  companyId       String
+  company         Company           @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  isSystem        Boolean           @default(false)
+
+  memberships     Membership[]
+  permissions     RolePermission[]
+
+  createdAt       DateTime          @default(now())
+  updatedAt       DateTime          @updatedAt
+
+  @@unique([name, companyId])
+  @@index([companyId])
+  @@map("company_roles")
+}
+
+
+model Company {
+  id              String       @id @default(cuid())
+  name            String
+  address         String?
+  phones          String?
+  email           String?
+  contact         String?
+  deleted         Boolean      @default(false)
+  logoUrl         String?      @map("logo_url")
+  isDefault       Boolean      @default(false)
+
+  memberships     Membership[]
+  companyRoles    CompanyRole[]
+
+  createdAt       DateTime     @default(now())
+  updatedAt       DateTime     @updatedAt
+
+  @@map("Company")
+}
+
+
+enum MembershipStatus {
+  invited
+  active
+  suspended
+}
+
+model Membership {
+  id          String               @id @default(cuid())
+
+  userId      String
+  user        User                 @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  companyId   String
+  company     Company              @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  roleId      String
+  role        CompanyRole          @relation(fields: [roleId], references: [id], onDelete: Restrict)
+
+  status      MembershipStatus     @default(active)
+
+  assignedBy  String?
+  assignedAt  DateTime             @default(now())
+  updatedAt   DateTime             @updatedAt
+
+  permissions MembershipPermission[]
+
+  @@unique([userId, companyId])
+  @@index([userId])
+  @@index([companyId])
+  @@index([roleId])
+  @@map("memberships")
+}
+
+
+enum PermissionAction {
+  GRANT
+  REVOKE
+}
+
+model MembershipPermission {
+  id            String            @id @default(cuid())
+
+  membershipId  String
+  membership    Membership        @relation(fields: [membershipId], references: [id], onDelete: Cascade)
+
+  permissionId  String
+  permission    Permission        @relation(fields: [permissionId], references: [id], onDelete: Cascade)
+
+  action        PermissionAction  @default(GRANT)
+  reason        String?
+  grantedBy     String?
+  createdAt     DateTime          @default(now())
+  updatedAt     DateTime          @updatedAt
+
+  @@unique([membershipId, permissionId])
+  @@index([permissionId])
+  @@map("membership_permissions")
+}
+
+
+model Permission {
+  id                    String                  @id @default(cuid())
+  code                  String                  @unique
+  description           String?
+  createdAt             DateTime                @default(now())
+
+  rolePermissions       RolePermission[]
+  membershipPermissions MembershipPermission[]
+
+  @@map("permissions")
+}
+
+
+model RolePermission {
+  roleId        String
+  permissionId  String
+
+  role          CompanyRole  @relation(fields: [roleId], references: [id], onDelete: Cascade)
+  permission    Permission   @relation(fields: [permissionId], references: [id], onDelete: Cascade)
+
+  @@id([roleId, permissionId])
+  @@index([permissionId])
+  @@map("role_permissions")
+}
+
+
+enum UserStatus {
+  pending
+  active
+  suspended
+}
+
+enum Access {
+  limited
+  full
+  none
+}
+
+model User {
+  id            String       @id @default(cuid())
+  img           String?
+  name          String
+  email         String       @unique
+  phone         String?
+  password      String
+  departments   String[]
+  access        Access       @default(none)
+  status        UserStatus   @default(active)
+  deleted       Boolean      @default(false)
+  online        Boolean      @default(false)
+  fcmTokens     String[]
+  google        Boolean      @default(false)
+  isTechnician  Boolean      @default(false)
+  createdAt     DateTime     @default(now())
+  updatedAt     DateTime     @updatedAt
+
+  auditLogs     AuditLog[]
+  memberships   Membership[]
+
+  @@index([deleted])
+  @@index([status])
+  @@index([name])
+}

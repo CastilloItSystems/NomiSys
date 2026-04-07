@@ -1,0 +1,20 @@
+model CompanyRole {
+  id              String            @id @default(cuid())
+  name            String
+  description     String?
+
+  companyId       String
+  company         Company           @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  isSystem        Boolean           @default(false)
+
+  memberships     Membership[]
+  permissions     RolePermission[]
+
+  createdAt       DateTime          @default(now())
+  updatedAt       DateTime          @updatedAt
+
+  @@unique([name, companyId])
+  @@index([companyId])
+  @@map("company_roles")
+}
