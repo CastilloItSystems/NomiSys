@@ -61,6 +61,7 @@ const EmpresaRoles = ({
     setLoading(true);
     try {
       const data = await getCompanyRoles(empresaId);
+      console.log("data", data);
       setRoles(data);
     } catch {
       toast.current?.show({

@@ -19,7 +19,8 @@ export const getCompanyRoles = async (
   companyId: string,
 ): Promise<CompanyRole[]> => {
   const response = await apiClient.get(`/companies/${companyId}/roles`);
-  return response.data.roles;
+  console.log("response", response);
+  return response.data.data.roles;
 };
 
 export const createCompanyRole = async (
@@ -27,7 +28,7 @@ export const createCompanyRole = async (
   data: { name: string; description?: string; permissionCodes: string[] },
 ): Promise<CompanyRole> => {
   const response = await apiClient.post(`/companies/${companyId}/roles`, data);
-  return response.data.role;
+  return response.data.data.role;
 };
 
 export const updateCompanyRole = async (
@@ -39,7 +40,7 @@ export const updateCompanyRole = async (
     `/companies/${companyId}/roles/${roleId}`,
     data,
   );
-  return response.data.role;
+  return response.data.data.role;
 };
 
 export const deleteCompanyRole = async (
