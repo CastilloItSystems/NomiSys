@@ -172,6 +172,7 @@ export default function EmployeeForm({
   const formContent = (
     <form
       id={formId}
+      className="p-fluid"
       onSubmit={(e) => {
         e.preventDefault();
         handleSubmit(onSubmit)();

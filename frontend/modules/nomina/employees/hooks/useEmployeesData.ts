@@ -48,9 +48,9 @@ export const useEmployee = (id?: string) => {
     ([, empId]) => getEmployee(empId as string),
     { revalidateOnFocus: false },
   );
-
+  console.log(data);
   return {
-    employee: data?.employee,
+    employee: data,
     jobInfo: data?.currentJobInfo,
     salaryHistory: data?.salaryHistory ?? [],
     jobHistory: data?.jobHistory ?? [],

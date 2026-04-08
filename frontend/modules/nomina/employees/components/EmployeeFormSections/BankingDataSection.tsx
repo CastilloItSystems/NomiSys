@@ -25,9 +25,9 @@ export default function BankingDataSection({ form }: BankingDataSectionProps) {
   const bankOptions = banks.map((b) => ({ label: b.name, value: b.id }));
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-      <div className="field">
-        <label htmlFor="bankId">
+    <div className="grid formgrid">
+      <div className="field col-12 md:col-6">
+        <label htmlFor="bankId" className="font-medium text-900 block mb-2">
           Banco <span className="text-red-500">*</span>
         </label>
         <Controller
@@ -43,7 +43,7 @@ export default function BankingDataSection({ form }: BankingDataSectionProps) {
               optionValue="value"
               placeholder="Seleccionar banco"
               loading={banksLoading}
-              className={classNames({ "p-invalid": errors.bankId })}
+              className={classNames("w-full", { "p-invalid": errors.bankId })}
             />
           )}
         />
@@ -52,8 +52,11 @@ export default function BankingDataSection({ form }: BankingDataSectionProps) {
         )}
       </div>
 
-      <div className="field">
-        <label htmlFor="accountType">
+      <div className="field col-12 md:col-6">
+        <label
+          htmlFor="accountType"
+          className="font-medium text-900 block mb-2"
+        >
           Tipo de Cuenta <span className="text-red-500">*</span>
         </label>
         <Controller
@@ -68,7 +71,9 @@ export default function BankingDataSection({ form }: BankingDataSectionProps) {
               optionLabel="label"
               optionValue="value"
               placeholder="Seleccionar tipo"
-              className={classNames({ "p-invalid": errors.accountType })}
+              className={classNames("w-full", {
+                "p-invalid": errors.accountType,
+              })}
             />
           )}
         />
@@ -77,8 +82,11 @@ export default function BankingDataSection({ form }: BankingDataSectionProps) {
         )}
       </div>
 
-      <div className="field col-span-full">
-        <label htmlFor="accountNumber">
+      <div className="field col-12">
+        <label
+          htmlFor="accountNumber"
+          className="font-medium text-900 block mb-2"
+        >
           Número de Cuenta <span className="text-red-500">*</span>
         </label>
         <Controller
@@ -101,7 +109,7 @@ export default function BankingDataSection({ form }: BankingDataSectionProps) {
         </small>
       </div>
 
-      <div className="col-span-full p-4 surface-card border-round-lg bg-amber-50 border-1 border-amber-200">
+      <div className="col-12 p-4 mt-4 surface-card border-round-lg bg-amber-50 border-1 border-amber-200">
         <h4 className="mt-0 mb-2">💳 Información Bancaria</h4>
         <ul className="text-sm list-disc list-inside m-0 space-y-1">
           <li>Este es el número de cuenta donde se depositarán los salarios</li>

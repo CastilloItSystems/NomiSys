@@ -26,12 +26,14 @@ export default function EmployeeExpedient({
 }: EmployeeExpedientProps) {
   const toast = useRef<Toast>(null);
   const router = useRouter();
+  console.log(employeeId);
   const {
     employee,
     jobInfo,
     loading: isLoading,
     error,
   } = useEmployee(employeeId);
+  console.log(employee);
   const { positions } = usePositionsData();
   const { departments } = useDepartmentsData();
 
@@ -172,57 +174,89 @@ export default function EmployeeExpedient({
               ) : employee ? (
                 <div className="grid">
                   <div className="col-12 lg:col-6">
-                    <Card title="Información General" className="mb-3">
-                      <div className="grid gap-3">
-                        <div className="col-12">
-                          <label className="font-bold">Código</label>
-                          <p>{employee.employeeCode}</p>
+                    <Card
+                      title="Información General"
+                      className="mb-3 h-full shadow-2"
+                    >
+                      <div className="grid formgrid">
+                        <div className="field col-12">
+                          <label className="font-semibold text-500 block mb-1">
+                            Código
+                          </label>
+                          <p className="m-0 text-900 text-lg">
+                            {employee.employeeCode}
+                          </p>
                         </div>
-                        <div className="col-12 md:col-6">
-                          <label className="font-bold">Nombre Completo</label>
-                          <p>
+                        <div className="field col-12 md:col-6">
+                          <label className="font-semibold text-500 block mb-1">
+                            Nombre Completo
+                          </label>
+                          <p className="m-0 text-900">
                             {employee.firstName} {employee.lastName}
                           </p>
                         </div>
-                        <div className="col-12 md:col-6">
-                          <label className="font-bold">Documento</label>
-                          <p>
+                        <div className="field col-12 md:col-6">
+                          <label className="font-semibold text-500 block mb-1">
+                            Documento
+                          </label>
+                          <p className="m-0 text-900">
                             {employee.documentType} - {employee.documentNumber}
                           </p>
                         </div>
-                        <div className="col-12 md:col-6">
-                          <label className="font-bold">Email</label>
-                          <p>{employee.email || "-"}</p>
+                        <div className="field col-12 md:col-6">
+                          <label className="font-semibold text-500 block mb-1">
+                            Email
+                          </label>
+                          <p className="m-0 text-900">
+                            {employee.email || "-"}
+                          </p>
                         </div>
-                        <div className="col-12 md:col-6">
-                          <label className="font-bold">Teléfono</label>
-                          <p>{employee.phone}</p>
+                        <div className="field col-12 md:col-6">
+                          <label className="font-semibold text-500 block mb-1">
+                            Teléfono
+                          </label>
+                          <p className="m-0 text-900">{employee.phone}</p>
                         </div>
                       </div>
                     </Card>
                   </div>
 
                   <div className="col-12 lg:col-6">
-                    <Card title="Información Laboral" className="mb-3">
-                      <div className="grid gap-3">
-                        <div className="col-12">
-                          <label className="font-bold">Posición</label>
-                          <p>{positionName}</p>
+                    <Card
+                      title="Información Laboral"
+                      className="mb-3 h-full shadow-2"
+                    >
+                      <div className="grid formgrid">
+                        <div className="field col-12">
+                          <label className="font-semibold text-500 block mb-1">
+                            Posición
+                          </label>
+                          <p className="m-0 text-900 font-medium">
+                            {positionName}
+                          </p>
                         </div>
-                        <div className="col-12 md:col-6">
-                          <label className="font-bold">Departamento</label>
-                          <p>{departmentName}</p>
+                        <div className="field col-12 md:col-6">
+                          <label className="font-semibold text-500 block mb-1">
+                            Departamento
+                          </label>
+                          <p className="m-0 text-900">{departmentName}</p>
                         </div>
-                        <div className="col-12 md:col-6">
-                          <label className="font-bold">Fecha de Inicio</label>
-                          <p>{formatDateFH(employee.hireDate)}</p>
+                        <div className="field col-12 md:col-6">
+                          <label className="font-semibold text-500 block mb-1">
+                            Fecha de Inicio
+                          </label>
+                          <p className="m-0 text-900">
+                            {formatDateFH(employee.hireDate)}
+                          </p>
                         </div>
-                        <div className="col-12 md:col-6">
-                          <label className="font-bold">Estado</label>
-                          <p>
+                        <div className="field col-12 md:col-6">
+                          <label className="font-semibold text-500 block mb-1">
+                            Estado
+                          </label>
+                          <p className="m-0">
                             <span
                               className={classNames(
-                                "surface-section px-3 py-2 border-round text-sm",
+                                "px-3 py-1 border-round-xl text-sm font-semibold",
                                 employee.status === "ACTIVE"
                                   ? "bg-green-100 text-green-700"
                                   : "bg-red-100 text-red-700",
@@ -250,56 +284,64 @@ export default function EmployeeExpedient({
               {isLoading ? (
                 <Skeleton height="300px" />
               ) : employee ? (
-                <div className="grid gap-3">
-                  <div className="col-12 md:col-6">
-                    <label className="font-bold block mb-2">
+                <div className="grid formgrid">
+                  <div className="field col-12 md:col-6 lg:col-3">
+                    <label className="font-semibold text-500 block mb-1">
                       Primer Nombre
                     </label>
-                    <p>{employee.firstName}</p>
+                    <p className="m-0 text-900">{employee.firstName}</p>
                   </div>
-                  <div className="col-12 md:col-6">
-                    <label className="font-bold block mb-2">
+                  <div className="field col-12 md:col-6 lg:col-3">
+                    <label className="font-semibold text-500 block mb-1">
                       Segundo Nombre
                     </label>
-                    <p>{employee.middleName || "-"}</p>
+                    <p className="m-0 text-900">{employee.middleName || "-"}</p>
                   </div>
-                  <div className="col-12 md:col-6">
-                    <label className="font-bold block mb-2">
+                  <div className="field col-12 md:col-6 lg:col-3">
+                    <label className="font-semibold text-500 block mb-1">
                       Primer Apellido
                     </label>
-                    <p>{employee.lastName}</p>
+                    <p className="m-0 text-900">{employee.lastName}</p>
                   </div>
-                  <div className="col-12 md:col-6">
-                    <label className="font-bold block mb-2">
+                  <div className="field col-12 md:col-6 lg:col-3">
+                    <label className="font-semibold text-500 block mb-1">
                       Segundo Apellido
                     </label>
-                    <p>{employee.secondLastName || "-"}</p>
+                    <p className="m-0 text-900">
+                      {employee.secondLastName || "-"}
+                    </p>
                   </div>
-                  <div className="col-12 md:col-6">
-                    <label className="font-bold block mb-2">
+                  <div className="field col-12 md:col-6 lg:col-4">
+                    <label className="font-semibold text-500 block mb-1">
                       Tipo de Documento
                     </label>
-                    <p>{employee.documentType}</p>
+                    <p className="m-0 text-900">{employee.documentType}</p>
                   </div>
-                  <div className="col-12 md:col-6">
-                    <label className="font-bold block mb-2">
+                  <div className="field col-12 md:col-6 lg:col-4">
+                    <label className="font-semibold text-500 block mb-1">
                       Número de Documento
                     </label>
-                    <p>{employee.documentNumber}</p>
+                    <p className="m-0 text-900">{employee.documentNumber}</p>
                   </div>
-                  <div className="col-12 md:col-6">
-                    <label className="font-bold block mb-2">
+                  <div className="field col-12 md:col-6 lg:col-4">
+                    <label className="font-semibold text-500 block mb-1">
                       Fecha de Nacimiento
                     </label>
-                    <p>{formatDateFH(employee.birthDate)}</p>
+                    <p className="m-0 text-900">
+                      {formatDateFH(employee.birthDate)}
+                    </p>
                   </div>
-                  <div className="col-12 md:col-6">
-                    <label className="font-bold block mb-2">Género</label>
-                    <p>{employee.gender || "-"}</p>
+                  <div className="field col-12 md:col-6 lg:col-4">
+                    <label className="font-semibold text-500 block mb-1">
+                      Género
+                    </label>
+                    <p className="m-0 text-900">{employee.gender || "-"}</p>
                   </div>
-                  <div className="col-12">
-                    <label className="font-bold block mb-2">Dirección</label>
-                    <p>{employee.address}</p>
+                  <div className="field col-12 lg:col-8">
+                    <label className="font-semibold text-500 block mb-1">
+                      Dirección
+                    </label>
+                    <p className="m-0 text-900">{employee.address}</p>
                   </div>
                 </div>
               ) : (
@@ -314,54 +356,64 @@ export default function EmployeeExpedient({
               {isLoading ? (
                 <Skeleton height="300px" />
               ) : jobInfo ? (
-                <div className="grid gap-3">
-                  <div className="col-12 md:col-6">
-                    <label className="font-bold block mb-2">
+                <div className="grid formgrid">
+                  <div className="field col-12 md:col-6 lg:col-3">
+                    <label className="font-semibold text-500 block mb-1">
                       Código de Empleado
                     </label>
-                    <p>{employee?.employeeCode}</p>
+                    <p className="m-0 text-900">{employee?.employeeCode}</p>
                   </div>
-                  <div className="col-12 md:col-6">
-                    <label className="font-bold block mb-2">
+                  <div className="field col-12 md:col-6 lg:col-3">
+                    <label className="font-semibold text-500 block mb-1">
                       Fecha de Incorporación
                     </label>
-                    <p>{formatDateFH(jobInfo.effectiveDate)}</p>
+                    <p className="m-0 text-900">
+                      {formatDateFH(jobInfo.effectiveDate)}
+                    </p>
                   </div>
-                  <div className="col-12 md:col-6">
-                    <label className="font-bold block mb-2">Posición</label>
-                    <p>{positionName}</p>
+                  <div className="field col-12 md:col-6 lg:col-3">
+                    <label className="font-semibold text-500 block mb-1">
+                      Posición
+                    </label>
+                    <p className="m-0 text-900">{positionName}</p>
                   </div>
-                  <div className="col-12 md:col-6">
-                    <label className="font-bold block mb-2">Departamento</label>
-                    <p>{departmentName}</p>
+                  <div className="field col-12 md:col-6 lg:col-3">
+                    <label className="font-semibold text-500 block mb-1">
+                      Departamento
+                    </label>
+                    <p className="m-0 text-900">{departmentName}</p>
                   </div>
-                  <div className="col-12 md:col-6">
-                    <label className="font-bold block mb-2">
+                  <div className="field col-12 md:col-6 lg:col-3">
+                    <label className="font-semibold text-500 block mb-1">
                       Centro de Costo
                     </label>
-                    <p>{jobInfo.costCenter || "-"}</p>
+                    <p className="m-0 text-900">{jobInfo.costCenter || "-"}</p>
                   </div>
-                  <div className="col-12 md:col-6">
-                    <label className="font-bold block mb-2">
+                  <div className="field col-12 md:col-6 lg:col-3">
+                    <label className="font-semibold text-500 block mb-1">
                       Tipo de Contrato
                     </label>
-                    <p>{jobInfo.contractType}</p>
+                    <p className="m-0 text-900">{jobInfo.contractType}</p>
                   </div>
-                  <div className="col-12 md:col-6">
-                    <label className="font-bold block mb-2">
+                  <div className="field col-12 md:col-6 lg:col-3">
+                    <label className="font-semibold text-500 block mb-1">
                       Jornada Laboral
                     </label>
-                    <p>{jobInfo.workShift}</p>
+                    <p className="m-0 text-900">{jobInfo.workShift}</p>
                   </div>
-                  <div className="col-12 md:col-6">
-                    <label className="font-bold block mb-2">Supervisor</label>
-                    <p>{jobInfo.supervisorId || "-"}</p>
+                  <div className="field col-12 md:col-6 lg:col-3">
+                    <label className="font-semibold text-500 block mb-1">
+                      Supervisor
+                    </label>
+                    <p className="m-0 text-900">
+                      {jobInfo.supervisorId || "-"}
+                    </p>
                   </div>
-                  <div className="col-12 md:col-6">
-                    <label className="font-bold block mb-2">
+                  <div className="field col-12 md:col-6 lg:col-3">
+                    <label className="font-semibold text-500 block mb-1">
                       Frecuencia de Pago
                     </label>
-                    <p>{jobInfo.payFrequency}</p>
+                    <p className="m-0 text-900">{jobInfo.payFrequency}</p>
                   </div>
                 </div>
               ) : (
@@ -378,43 +430,47 @@ export default function EmployeeExpedient({
               {isLoading ? (
                 <Skeleton height="300px" />
               ) : employee ? (
-                <div className="grid gap-3">
-                  <div className="col-12 md:col-6">
-                    <label className="font-bold block mb-2">IVSS</label>
-                    <p>{employee.ivssNumber || "-"}</p>
+                <div className="grid formgrid">
+                  <div className="field col-12 md:col-6 lg:col-3">
+                    <label className="font-semibold text-500 block mb-1">
+                      IVSS
+                    </label>
+                    <p className="m-0 text-900">{employee.ivssNumber || "-"}</p>
                   </div>
-                  <div className="col-12 md:col-6">
-                    <label className="font-bold block mb-2">RIF</label>
-                    <p>{employee.rifNumber || "-"}</p>
+                  <div className="field col-12 md:col-6 lg:col-3">
+                    <label className="font-semibold text-500 block mb-1">
+                      RIF
+                    </label>
+                    <p className="m-0 text-900">{employee.rifNumber || "-"}</p>
                   </div>
-                  <div className="col-12 md:col-6">
-                    <label className="font-bold block mb-2">
+                  <div className="field col-12 md:col-6 lg:col-3">
+                    <label className="font-semibold text-500 block mb-1">
                       ¿Afiliado a FAOV?
                     </label>
-                    <p>
+                    <p className="m-0">
                       <span
                         className={classNames(
-                          "surface-section px-2 py-1 border-round text-sm",
+                          "px-3 py-1 border-round-xl text-sm font-semibold",
                           employee.isFaovEnrolled
                             ? "bg-green-100 text-green-700"
-                            : "bg-gray-100 text-gray-700",
+                            : "bg-gray-200 text-gray-700",
                         )}
                       >
                         {employee.isFaovEnrolled ? "Sí" : "No"}
                       </span>
                     </p>
                   </div>
-                  <div className="col-12 md:col-6">
-                    <label className="font-bold block mb-2">
+                  <div className="field col-12 md:col-6 lg:col-3">
+                    <label className="font-semibold text-500 block mb-1">
                       ¿Afiliado a INCES?
                     </label>
-                    <p>
+                    <p className="m-0">
                       <span
                         className={classNames(
-                          "surface-section px-2 py-1 border-round text-sm",
+                          "px-3 py-1 border-round-xl text-sm font-semibold",
                           employee.isIncesEnrolled
                             ? "bg-green-100 text-green-700"
-                            : "bg-gray-100 text-gray-700",
+                            : "bg-gray-200 text-gray-700",
                         )}
                       >
                         {employee.isIncesEnrolled ? "Sí" : "No"}

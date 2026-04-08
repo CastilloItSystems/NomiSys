@@ -67,9 +67,12 @@ export default function LaboralDataSection({ form }: LaboralDataSectionProps) {
   }));
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-      <div className="field">
-        <label htmlFor="employeeCode">
+    <div className="grid formgrid">
+      <div className="field col-12 md:col-6 lg:col-3">
+        <label
+          htmlFor="employeeCode"
+          className="font-medium text-900 block mb-2"
+        >
           Código de Empleado <span className="text-red-500">*</span>
         </label>
         <InputText
@@ -83,8 +86,8 @@ export default function LaboralDataSection({ form }: LaboralDataSectionProps) {
         )}
       </div>
 
-      <div className="field">
-        <label htmlFor="hireDate">
+      <div className="field col-12 md:col-6 lg:col-3">
+        <label htmlFor="hireDate" className="font-medium text-900 block mb-2">
           Fecha de Ingreso <span className="text-red-500">*</span>
         </label>
         <Controller
@@ -108,8 +111,11 @@ export default function LaboralDataSection({ form }: LaboralDataSectionProps) {
         )}
       </div>
 
-      <div className="field">
-        <label htmlFor="departmentId">
+      <div className="field col-12 md:col-6 lg:col-3">
+        <label
+          htmlFor="departmentId"
+          className="font-medium text-900 block mb-2"
+        >
           Departamento <span className="text-red-500">*</span>
         </label>
         <Controller
@@ -125,7 +131,9 @@ export default function LaboralDataSection({ form }: LaboralDataSectionProps) {
               optionValue="value"
               placeholder="Seleccionar"
               loading={deptLoading}
-              className={classNames({ "p-invalid": errors.departmentId })}
+              className={classNames("w-full", {
+                "p-invalid": errors.departmentId,
+              })}
             />
           )}
         />
@@ -134,8 +142,8 @@ export default function LaboralDataSection({ form }: LaboralDataSectionProps) {
         )}
       </div>
 
-      <div className="field">
-        <label htmlFor="positionId">
+      <div className="field col-12 md:col-6 lg:col-3">
+        <label htmlFor="positionId" className="font-medium text-900 block mb-2">
           Cargo <span className="text-red-500">*</span>
         </label>
         <Controller
@@ -151,7 +159,9 @@ export default function LaboralDataSection({ form }: LaboralDataSectionProps) {
               optionValue="value"
               placeholder="Seleccionar"
               loading={posLoading}
-              className={classNames({ "p-invalid": errors.positionId })}
+              className={classNames("w-full", {
+                "p-invalid": errors.positionId,
+              })}
             />
           )}
         />
@@ -160,8 +170,11 @@ export default function LaboralDataSection({ form }: LaboralDataSectionProps) {
         )}
       </div>
 
-      <div className="field">
-        <label htmlFor="contractType">
+      <div className="field col-12 md:col-6 lg:col-3">
+        <label
+          htmlFor="contractType"
+          className="font-medium text-900 block mb-2"
+        >
           Tipo de Contrato <span className="text-red-500">*</span>
         </label>
         <Controller
@@ -176,7 +189,9 @@ export default function LaboralDataSection({ form }: LaboralDataSectionProps) {
               optionLabel="label"
               optionValue="value"
               placeholder="Seleccionar"
-              className={classNames({ "p-invalid": errors.contractType })}
+              className={classNames("w-full", {
+                "p-invalid": errors.contractType,
+              })}
             />
           )}
         />
@@ -185,8 +200,8 @@ export default function LaboralDataSection({ form }: LaboralDataSectionProps) {
         )}
       </div>
 
-      <div className="field">
-        <label htmlFor="workShift">
+      <div className="field col-12 md:col-6 lg:col-3">
+        <label htmlFor="workShift" className="font-medium text-900 block mb-2">
           Tipo de Jornada <span className="text-red-500">*</span>
         </label>
         <Controller
@@ -201,7 +216,9 @@ export default function LaboralDataSection({ form }: LaboralDataSectionProps) {
               optionLabel="label"
               optionValue="value"
               placeholder="Seleccionar"
-              className={classNames({ "p-invalid": errors.workShift })}
+              className={classNames("w-full", {
+                "p-invalid": errors.workShift,
+              })}
             />
           )}
         />
@@ -210,8 +227,11 @@ export default function LaboralDataSection({ form }: LaboralDataSectionProps) {
         )}
       </div>
 
-      <div className="field">
-        <label htmlFor="payFrequency">
+      <div className="field col-12 md:col-6 lg:col-3">
+        <label
+          htmlFor="payFrequency"
+          className="font-medium text-900 block mb-2"
+        >
           Frecuencia de Pago <span className="text-red-500">*</span>
         </label>
         <Controller
@@ -226,7 +246,9 @@ export default function LaboralDataSection({ form }: LaboralDataSectionProps) {
               optionLabel="label"
               optionValue="value"
               placeholder="Seleccionar"
-              className={classNames({ "p-invalid": errors.payFrequency })}
+              className={classNames("w-full", {
+                "p-invalid": errors.payFrequency,
+              })}
             />
           )}
         />
@@ -235,8 +257,10 @@ export default function LaboralDataSection({ form }: LaboralDataSectionProps) {
         )}
       </div>
 
-      <div className="field">
-        <label htmlFor="costCenter">Centro de Costo</label>
+      <div className="field col-12 md:col-6 lg:col-3">
+        <label htmlFor="costCenter" className="font-medium text-900 block mb-2">
+          Centro de Costo
+        </label>
         <InputText
           id="costCenter"
           {...register("costCenter")}
@@ -244,8 +268,11 @@ export default function LaboralDataSection({ form }: LaboralDataSectionProps) {
         />
       </div>
 
-      <div className="field">
-        <label htmlFor="salaryAmount">
+      <div className="field col-12 md:col-6 lg:col-4">
+        <label
+          htmlFor="salaryAmount"
+          className="font-medium text-900 block mb-2"
+        >
           Salario Base <span className="text-red-500">*</span>
         </label>
         <Controller
@@ -265,8 +292,8 @@ export default function LaboralDataSection({ form }: LaboralDataSectionProps) {
         )}
       </div>
 
-      <div className="field">
-        <label htmlFor="currency">
+      <div className="field col-12 md:col-6 lg:col-4">
+        <label htmlFor="currency" className="font-medium text-900 block mb-2">
           Moneda <span className="text-red-500">*</span>
         </label>
         <Controller
@@ -281,7 +308,7 @@ export default function LaboralDataSection({ form }: LaboralDataSectionProps) {
               optionLabel="label"
               optionValue="value"
               placeholder="Seleccionar"
-              className={classNames({ "p-invalid": errors.currency })}
+              className={classNames("w-full", { "p-invalid": errors.currency })}
             />
           )}
         />
@@ -290,8 +317,13 @@ export default function LaboralDataSection({ form }: LaboralDataSectionProps) {
         )}
       </div>
 
-      <div className="field col-span-full md:col-span-1">
-        <label htmlFor="supervisorId">Supervisor</label>
+      <div className="field col-12 md:col-6 lg:col-4">
+        <label
+          htmlFor="supervisorId"
+          className="font-medium text-900 block mb-2"
+        >
+          Supervisor
+        </label>
         <Controller
           name="supervisorId"
           control={control}
@@ -306,6 +338,7 @@ export default function LaboralDataSection({ form }: LaboralDataSectionProps) {
               placeholder="Seleccionar (opcional)"
               loading={empLoading}
               showClear
+              className="w-full"
             />
           )}
         />

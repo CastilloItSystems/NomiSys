@@ -82,98 +82,111 @@ const PositionForm = ({
   };
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} id={formId}>
-      {/* ──────────────────────────────────────────────────────────────── */}
-      {/* NOMBRE */}
-      {/* ──────────────────────────────────────────────────────────────── */}
-      <div className="field">
-        <label htmlFor="name">
-          Nombre <span className="text-red-500">*</span>
-        </label>
-        <InputText
-          id="name"
-          {...register("name")}
-          className={classNames({ "p-invalid": errors.name })}
-          placeholder="Ej: Gerente de Ventas"
-        />
-        {errors.name && (
-          <small className="p-error">{errors.name.message}</small>
-        )}
-      </div>
-
-      {/* ──────────────────────────────────────────────────────────────── */}
-      {/* CÓDIGO */}
-      {/* ──────────────────────────────────────────────────────────────── */}
-      <div className="field">
-        <label htmlFor="code">Código</label>
-        <InputText
-          id="code"
-          {...register("code")}
-          className={classNames({ "p-invalid": errors.code })}
-          placeholder="Ej: GER-VENTAS"
-          maxLength={20}
-        />
-        {errors.code && (
-          <small className="p-error">{errors.code.message}</small>
-        )}
-      </div>
-
-      {/* ──────────────────────────────────────────────────────────────── */}
-      {/* DESCRIPCIÓN */}
-      {/* ──────────────────────────────────────────────────────────────── */}
-      <div className="field">
-        <label htmlFor="description">Descripción</label>
-        <InputText
-          id="description"
-          {...register("description")}
-          className={classNames({ "p-invalid": errors.description })}
-          placeholder="Descripción del cargo"
-          maxLength={500}
-        />
-        {errors.description && (
-          <small className="p-error">{errors.description.message}</small>
-        )}
-      </div>
-
-      {/* ──────────────────────────────────────────────────────────────── */}
-      {/* NIVEL JERÁRQUICO */}
-      {/* ──────────────────────────────────────────────────────────────── */}
-      <div className="field">
-        <label htmlFor="level">Nivel Jerárquico</label>
-        <Controller
-          name="level"
-          control={control}
-          render={({ field }) => (
-            <InputNumber
-              id="level"
-              value={field.value}
-              onValueChange={(e) => field.onChange(e.value)}
-              placeholder="Nivel"
-              min={1}
-            />
+    <form onSubmit={handleSubmit(onSubmit)} id={formId} className="p-fluid">
+      <div className="grid formgrid">
+        {/* ──────────────────────────────────────────────────────────────── */}
+        {/* NOMBRE */}
+        {/* ──────────────────────────────────────────────────────────────── */}
+        <div className="field col-12 md:col-6">
+          <label htmlFor="name" className="font-medium text-900 block mb-2">
+            Nombre <span className="text-red-500">*</span>
+          </label>
+          <InputText
+            id="name"
+            {...register("name")}
+            className={classNames({ "p-invalid": errors.name })}
+            placeholder="Ej: Gerente de Ventas"
+          />
+          {errors.name && (
+            <small className="p-error">{errors.name.message}</small>
           )}
-        />
-        {errors.level && (
-          <small className="p-error">{errors.level.message}</small>
-        )}
-      </div>
+        </div>
 
-      {/* ──────────────────────────────────────────────────────────────── */}
-      {/* ACTIVO */}
-      {/* ──────────────────────────────────────────────────────────────── */}
-      <div className="field">
-        <label htmlFor="isActive">Activo</label>
-        <Controller
-          name="isActive"
-          control={control}
-          render={({ field }) => (
-            <InputSwitch
-              id="isActive"
-              checked={field.value}
-              onChange={(e) => field.onChange(e.value)}
-            />
+        {/* ──────────────────────────────────────────────────────────────── */}
+        {/* CÓDIGO */}
+        {/* ──────────────────────────────────────────────────────────────── */}
+        <div className="field col-12 md:col-6">
+          <label htmlFor="code" className="font-medium text-900 block mb-2">
+            Código
+          </label>
+          <InputText
+            id="code"
+            {...register("code")}
+            className={classNames({ "p-invalid": errors.code })}
+            placeholder="Ej: GER-VENTAS"
+            maxLength={20}
+          />
+          {errors.code && (
+            <small className="p-error">{errors.code.message}</small>
           )}
-        />
+        </div>
+
+        {/* ──────────────────────────────────────────────────────────────── */}
+        {/* DESCRIPCIÓN */}
+        {/* ──────────────────────────────────────────────────────────────── */}
+        <div className="field col-12">
+          <label
+            htmlFor="description"
+            className="font-medium text-900 block mb-2"
+          >
+            Descripción
+          </label>
+          <InputText
+            id="description"
+            {...register("description")}
+            className={classNames({ "p-invalid": errors.description })}
+            placeholder="Descripción del cargo"
+            maxLength={500}
+          />
+          {errors.description && (
+            <small className="p-error">{errors.description.message}</small>
+          )}
+        </div>
+
+        {/* ──────────────────────────────────────────────────────────────── */}
+        {/* NIVEL JERÁRQUICO */}
+        {/* ──────────────────────────────────────────────────────────────── */}
+        <div className="field col-12 md:col-6">
+          <label htmlFor="level" className="font-medium text-900 block mb-2">
+            Nivel Jerárquico
+          </label>
+          <Controller
+            name="level"
+            control={control}
+            render={({ field }) => (
+              <InputNumber
+                id="level"
+                value={field.value}
+                onValueChange={(e) => field.onChange(e.value)}
+                placeholder="Nivel"
+                min={1}
+              />
+            )}
+          />
+          {errors.level && (
+            <small className="p-error">{errors.level.message}</small>
+          )}
+        </div>
+
+        {/* ──────────────────────────────────────────────────────────────── */}
+        {/* ACTIVO */}
+        {/* ──────────────────────────────────────────────────────────────── */}
+        <div className="field col-12 md:col-6 flex flex-column">
+          <label htmlFor="isActive" className="font-medium text-900 block mb-2">
+            Activo
+          </label>
+          <Controller
+            name="isActive"
+            control={control}
+            render={({ field }) => (
+              <InputSwitch
+                id="isActive"
+                checked={field.value}
+                onChange={(e) => field.onChange(e.value)}
+              />
+            )}
+          />
+        </div>
       </div>
     </form>
   );

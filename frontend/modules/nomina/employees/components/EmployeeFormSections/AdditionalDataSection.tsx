@@ -20,9 +20,12 @@ export default function AdditionalDataSection({
   } = form;
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-      <div className="field">
-        <label htmlFor="emergencyContactName">
+    <div className="grid formgrid">
+      <div className="field col-12 md:col-6">
+        <label
+          htmlFor="emergencyContactName"
+          className="font-medium text-900 block mb-2"
+        >
           Nombre Contacto de Emergencia
         </label>
         <InputText
@@ -39,8 +42,11 @@ export default function AdditionalDataSection({
         )}
       </div>
 
-      <div className="field">
-        <label htmlFor="emergencyContactPhone">
+      <div className="field col-12 md:col-6">
+        <label
+          htmlFor="emergencyContactPhone"
+          className="font-medium text-900 block mb-2"
+        >
           Teléfono Contacto de Emergencia
         </label>
         <Controller
@@ -56,8 +62,13 @@ export default function AdditionalDataSection({
         />
       </div>
 
-      <div className="field col-span-full">
-        <label htmlFor="observations">Observaciones</label>
+      <div className="field col-12">
+        <label
+          htmlFor="observations"
+          className="font-medium text-900 block mb-2"
+        >
+          Observaciones
+        </label>
         <InputText
           id="observations"
           {...register("observations")}

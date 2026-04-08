@@ -64,22 +64,6 @@ const NominaPage: Page = () => {
     { id: 6, emp: "Carlos Méndez", code: "EMP-006", dept: "Logística", type: "Error de salario", impact: "Revisión", status: "Pendiente" },
   ];
 
-  // --- TABLA 3: Últimas nóminas procesadas (original) ---
-  const recentPayrolls = [
-    { id: "104", period: "1ra Quincena Abril 2026", date: "2026-04-15", amount: 62500, status: "Pendiente" },
-    { id: "103", period: "2da Quincena Marzo 2026", date: "2026-03-30", amount: 62000, status: "Pagado" },
-    { id: "102", period: "1ra Quincena Marzo 2026", date: "2026-03-15", amount: 62000, status: "Pagado" },
-    { id: "101", period: "2da Quincena Febrero 2026", date: "2026-02-28", amount: 61000, status: "Pagado" },
-  ];
-
-  // --- TABLA 4: Novedades y vencimientos (original) ---
-  const upcomingEvents = [
-    { id: 1, employee: "Carlos Mendoza", type: "Vacaciones", detail: "10 Abr - 25 Abr", severity: "info" },
-    { id: 2, employee: "Ana Silva", type: "Fin de Contrato", detail: "15 Abr 2026", severity: "warning" },
-    { id: 3, employee: "Luis Rodríguez", type: "Vacaciones", detail: "18 Abr - 05 May", severity: "info" },
-    { id: 4, employee: "Elena Pineda", type: "Fin de Contrato", detail: "30 Abr 2026", severity: "warning" },
-  ];
-
   // Helpers
   const formatBs = (value: number) => {
     return new Intl.NumberFormat("es-VE", { style: "currency", currency: "VES" }).format(value);
@@ -114,7 +98,7 @@ const NominaPage: Page = () => {
 
       {/* --- 4. CARDS KPI SUPERIORES --- */}
       {/* Card 1: Nómina total */}
-      <div className="col-12 md:col-6 xl:col-4">
+      <div className="col-12 md:col-6 lg:col-4 xl:col-2">
         <div className="surface-card shadow-2 p-3 border-round h-full border-top-3 border-blue-500">
           <div className="flex justify-content-between mb-3">
             <div>
@@ -131,7 +115,7 @@ const NominaPage: Page = () => {
       </div>
 
       {/* Card 2: Neto a pagar */}
-      <div className="col-12 md:col-6 xl:col-4">
+      <div className="col-12 md:col-6 lg:col-4 xl:col-2">
         <div className="surface-card shadow-2 p-3 border-round h-full border-top-3 border-green-500">
           <div className="flex justify-content-between mb-3">
             <div>
@@ -147,7 +131,7 @@ const NominaPage: Page = () => {
       </div>
 
       {/* Card 3: Empleados procesados */}
-      <div className="col-12 md:col-6 xl:col-4">
+      <div className="col-12 md:col-6 lg:col-4 xl:col-2">
         <div className="surface-card shadow-2 p-3 border-round h-full border-top-3 border-indigo-500">
           <div className="flex justify-content-between mb-3">
             <div>
@@ -163,7 +147,7 @@ const NominaPage: Page = () => {
       </div>
 
       {/* Card 4: Total deducciones */}
-      <div className="col-12 md:col-6 xl:col-4">
+      <div className="col-12 md:col-6 lg:col-4 xl:col-2">
         <div className="surface-card shadow-2 p-3 border-round h-full border-top-3 border-pink-400">
           <div className="flex justify-content-between mb-3">
             <div>
@@ -179,7 +163,7 @@ const NominaPage: Page = () => {
       </div>
 
       {/* Card 5: Bono de alimentación */}
-      <div className="col-12 md:col-6 xl:col-4">
+      <div className="col-12 md:col-6 lg:col-4 xl:col-2">
         <div className="surface-card shadow-2 p-3 border-round h-full border-top-3 border-orange-500">
           <div className="flex justify-content-between mb-3">
             <div>
@@ -195,7 +179,7 @@ const NominaPage: Page = () => {
       </div>
 
       {/* Card 6: Estado corrida */}
-      <div className="col-12 md:col-6 xl:col-4">
+      <div className="col-12 md:col-6 lg:col-4 xl:col-2">
         <div className="surface-card shadow-2 p-3 border-round h-full border-top-3 border-yellow-500">
           <div className="flex justify-content-between mb-3">
             <div>
@@ -207,6 +191,106 @@ const NominaPage: Page = () => {
             </div>
           </div>
           <span className="text-500 text-sm">Cierre estimado: 10/04/2026</span>
+        </div>
+      </div>
+
+      {/* --- KPIs ANTERIORES INTEGRADOS --- */}
+      {/* Card 7: Costo Nómina (Mes) */}
+      <div className="col-12 md:col-6 lg:col-4 xl:col-2">
+        <div className="surface-card shadow-2 p-3 border-round h-full border-top-3 border-cyan-500">
+          <div className="flex justify-content-between mb-3">
+            <div>
+              <span className="block text-600 font-medium mb-2">Costo Nómina (Mes)</span>
+              <div className="text-900 font-bold text-2xl">{formatBs(125000)}</div>
+            </div>
+            <div className="flex align-items-center justify-content-center bg-cyan-100 border-round" style={{ width: "3rem", height: "3rem" }}>
+              <i className="pi pi-dollar text-cyan-500 text-xl"></i>
+            </div>
+          </div>
+          <span className="text-green-500 font-medium">+2.5% </span>
+          <span className="text-500 text-sm">desde el mes pasado</span>
+        </div>
+      </div>
+
+      {/* Card 8: Empleados Activos */}
+      <div className="col-12 md:col-6 lg:col-4 xl:col-2">
+        <div className="surface-card shadow-2 p-3 border-round h-full border-top-3 border-teal-500">
+          <div className="flex justify-content-between mb-3">
+            <div>
+              <span className="block text-600 font-medium mb-2">Empleados Activos</span>
+              <div className="text-900 font-bold text-2xl">142</div>
+            </div>
+            <div className="flex align-items-center justify-content-center bg-teal-100 border-round" style={{ width: "3rem", height: "3rem" }}>
+              <i className="pi pi-users text-teal-500 text-xl"></i>
+            </div>
+          </div>
+          <span className="text-green-500 font-medium">3 </span>
+          <span className="text-500 text-sm">nuevos ingresos</span>
+        </div>
+      </div>
+
+      {/* Card 9: En Vacaciones */}
+      <div className="col-12 md:col-6 lg:col-4 xl:col-2">
+        <div className="surface-card shadow-2 p-3 border-round h-full border-top-3 border-amber-500">
+          <div className="flex justify-content-between mb-3">
+            <div>
+              <span className="block text-600 font-medium mb-2">En Vacaciones</span>
+              <div className="text-900 font-bold text-2xl">8</div>
+            </div>
+            <div className="flex align-items-center justify-content-center bg-amber-100 border-round" style={{ width: "3rem", height: "3rem" }}>
+              <i className="pi pi-sun text-amber-500 text-xl"></i>
+            </div>
+          </div>
+          <span className="text-500 text-sm">Actualmente disfrutando</span>
+        </div>
+      </div>
+
+      {/* Card 10: Vencimientos (Mes) */}
+      <div className="col-12 md:col-6 lg:col-4 xl:col-2">
+        <div className="surface-card shadow-2 p-3 border-round h-full border-top-3 border-red-500">
+          <div className="flex justify-content-between mb-3">
+            <div>
+              <span className="block text-600 font-medium mb-2">Vencimientos (Mes)</span>
+              <div className="text-900 font-bold text-2xl">5</div>
+            </div>
+            <div className="flex align-items-center justify-content-center bg-red-100 border-round" style={{ width: "3rem", height: "3rem" }}>
+              <i className="pi pi-file text-red-500 text-xl"></i>
+            </div>
+          </div>
+          <span className="text-red-500 font-medium">Atención requerida</span>
+        </div>
+      </div>
+
+      {/* --- KPIs ADICIONALES SUGERIDOS --- */}
+      {/* Card 11: Salario Promedio */}
+      <div className="col-12 md:col-6 lg:col-4 xl:col-2">
+        <div className="surface-card shadow-2 p-3 border-round h-full border-top-3 border-purple-500">
+          <div className="flex justify-content-between mb-3">
+            <div>
+              <span className="block text-600 font-medium mb-2">Salario Promedio</span>
+              <div className="text-900 font-bold text-2xl">{formatBs(3500)}</div>
+            </div>
+            <div className="flex align-items-center justify-content-center bg-purple-100 border-round" style={{ width: "3rem", height: "3rem" }}>
+              <i className="pi pi-chart-line text-purple-500 text-xl"></i>
+            </div>
+          </div>
+          <span className="text-500 text-sm">Por empleado activo</span>
+        </div>
+      </div>
+
+      {/* Card 12: Total Horas Extras */}
+      <div className="col-12 md:col-6 lg:col-4 xl:col-2">
+        <div className="surface-card shadow-2 p-3 border-round h-full border-top-3 border-lime-500">
+          <div className="flex justify-content-between mb-3">
+            <div>
+              <span className="block text-600 font-medium mb-2">Total Horas Extras</span>
+              <div className="text-900 font-bold text-2xl">{formatBs(12500)}</div>
+            </div>
+            <div className="flex align-items-center justify-content-center bg-lime-100 border-round" style={{ width: "3rem", height: "3rem" }}>
+              <i className="pi pi-clock text-lime-500 text-xl"></i>
+            </div>
+          </div>
+          <span className="text-500 text-sm">Monto total del período</span>
         </div>
       </div>
 

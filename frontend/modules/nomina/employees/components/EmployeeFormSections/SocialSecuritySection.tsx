@@ -19,9 +19,11 @@ export default function SocialSecuritySection({
   } = form;
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-      <div className="field">
-        <label htmlFor="ivssNumber">Número IVSS</label>
+    <div className="grid formgrid">
+      <div className="field col-12 md:col-6">
+        <label htmlFor="ivssNumber" className="font-medium text-900 block mb-2">
+          Número IVSS
+        </label>
         <InputText
           id="ivssNumber"
           {...register("ivssNumber")}
@@ -36,8 +38,10 @@ export default function SocialSecuritySection({
         </small>
       </div>
 
-      <div className="field">
-        <label htmlFor="rifNumber">RIF del Empleado</label>
+      <div className="field col-12 md:col-6">
+        <label htmlFor="rifNumber" className="font-medium text-900 block mb-2">
+          RIF del Empleado
+        </label>
         <InputText
           id="rifNumber"
           {...register("rifNumber")}
@@ -53,8 +57,13 @@ export default function SocialSecuritySection({
         </small>
       </div>
 
-      <div className="field">
-        <label htmlFor="isFaovEnrolled">Inscrito en FAOV</label>
+      <div className="field col-12 md:col-6 flex flex-column">
+        <label
+          htmlFor="isFaovEnrolled"
+          className="font-medium text-900 block mb-2"
+        >
+          Inscrito en FAOV
+        </label>
         <Controller
           name="isFaovEnrolled"
           control={control}
@@ -71,8 +80,13 @@ export default function SocialSecuritySection({
         </small>
       </div>
 
-      <div className="field">
-        <label htmlFor="isIncesEnrolled">Inscrito en INCES</label>
+      <div className="field col-12 md:col-6 flex flex-column">
+        <label
+          htmlFor="isIncesEnrolled"
+          className="font-medium text-900 block mb-2"
+        >
+          Inscrito en INCES
+        </label>
         <Controller
           name="isIncesEnrolled"
           control={control}
@@ -89,7 +103,7 @@ export default function SocialSecuritySection({
         </small>
       </div>
 
-      <div className="col-span-full p-4 surface-card border-round-lg bg-blue-50 border-1 border-blue-200">
+      <div className="col-12 p-4 mt-4 surface-card border-round-lg bg-blue-50 border-1 border-blue-200">
         <h4 className="mt-0 mb-2">
           ℹ️ Información de Seguridad Social Venezuela
         </h4>

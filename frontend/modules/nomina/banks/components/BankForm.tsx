@@ -77,60 +77,64 @@ const BankForm = ({
   };
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} id={formId}>
-      {/* ──────────────────────────────────────────────────────────────── */}
-      {/* NOMBRE */}
-      {/* ──────────────────────────────────────────────────────────────── */}
-      <div className="field">
-        <label htmlFor="name">
-          Nombre <span className="text-red-500">*</span>
-        </label>
-        <InputText
-          id="name"
-          {...register("name")}
-          className={classNames({ "p-invalid": errors.name })}
-          placeholder="Ej: Banesco"
-        />
-        {errors.name && (
-          <small className="p-error">{errors.name.message}</small>
-        )}
-      </div>
-
-      {/* ──────────────────────────────────────────────────────────────── */}
-      {/* CÓDIGO SUDEBAN */}
-      {/* ──────────────────────────────────────────────────────────────── */}
-      <div className="field">
-        <label htmlFor="code">
-          Código SUDEBAN <span className="text-red-500">*</span>
-        </label>
-        <InputText
-          id="code"
-          {...register("code")}
-          className={classNames({ "p-invalid": errors.code })}
-          placeholder="Ej: 0134"
-          maxLength={10}
-        />
-        {errors.code && (
-          <small className="p-error">{errors.code.message}</small>
-        )}
-      </div>
-
-      {/* ──────────────────────────────────────────────────────────────── */}
-      {/* ACTIVO */}
-      {/* ──────────────────────────────────────────────────────────────── */}
-      <div className="field">
-        <label htmlFor="isActive">Activo</label>
-        <Controller
-          name="isActive"
-          control={control}
-          render={({ field }) => (
-            <InputSwitch
-              id="isActive"
-              checked={field.value}
-              onChange={(e) => field.onChange(e.value)}
-            />
+    <form onSubmit={handleSubmit(onSubmit)} id={formId} className="p-fluid">
+      <div className="grid formgrid">
+        {/* ──────────────────────────────────────────────────────────────── */}
+        {/* NOMBRE */}
+        {/* ──────────────────────────────────────────────────────────────── */}
+        <div className="field col-12 md:col-6">
+          <label htmlFor="name" className="font-medium text-900 block mb-2">
+            Nombre <span className="text-red-500">*</span>
+          </label>
+          <InputText
+            id="name"
+            {...register("name")}
+            className={classNames({ "p-invalid": errors.name })}
+            placeholder="Ej: Banesco"
+          />
+          {errors.name && (
+            <small className="p-error">{errors.name.message}</small>
           )}
-        />
+        </div>
+
+        {/* ──────────────────────────────────────────────────────────────── */}
+        {/* CÓDIGO SUDEBAN */}
+        {/* ──────────────────────────────────────────────────────────────── */}
+        <div className="field col-12 md:col-6">
+          <label htmlFor="code" className="font-medium text-900 block mb-2">
+            Código SUDEBAN <span className="text-red-500">*</span>
+          </label>
+          <InputText
+            id="code"
+            {...register("code")}
+            className={classNames({ "p-invalid": errors.code })}
+            placeholder="Ej: 0134"
+            maxLength={10}
+          />
+          {errors.code && (
+            <small className="p-error">{errors.code.message}</small>
+          )}
+        </div>
+
+        {/* ──────────────────────────────────────────────────────────────── */}
+        {/* ACTIVO */}
+        {/* ──────────────────────────────────────────────────────────────── */}
+        <div className="field col-12 md:col-6 flex flex-column">
+          <label htmlFor="isActive" className="font-medium text-900 block mb-2">
+            Activo
+          </label>
+          <Controller
+            name="isActive"
+            control={control}
+            render={({ field }) => (
+              <InputSwitch
+                id="isActive"
+                checked={field.value}
+                onChange={(e) => field.onChange(e.value)}
+              />
+            )}
+          />
+        </div>
       </div>
     </form>
   );

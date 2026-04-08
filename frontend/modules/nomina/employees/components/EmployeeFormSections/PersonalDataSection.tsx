@@ -39,10 +39,10 @@ export default function PersonalDataSection({
   } = form;
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-      {/* Row 1: Names */}
-      <div className="field">
-        <label htmlFor="firstName">
+    <div className="grid formgrid">
+      {/* Nombres */}
+      <div className="field col-12 md:col-6 lg:col-3">
+        <label htmlFor="firstName" className="font-medium text-900 block mb-2">
           Primer Nombre <span className="text-red-500">*</span>
         </label>
         <InputText
@@ -56,8 +56,10 @@ export default function PersonalDataSection({
         )}
       </div>
 
-      <div className="field">
-        <label htmlFor="middleName">Segundo Nombre</label>
+      <div className="field col-12 md:col-6 lg:col-3">
+        <label htmlFor="middleName" className="font-medium text-900 block mb-2">
+          Segundo Nombre
+        </label>
         <InputText
           id="middleName"
           {...register("middleName")}
@@ -65,8 +67,8 @@ export default function PersonalDataSection({
         />
       </div>
 
-      <div className="field">
-        <label htmlFor="lastName">
+      <div className="field col-12 md:col-6 lg:col-3">
+        <label htmlFor="lastName" className="font-medium text-900 block mb-2">
           Primer Apellido <span className="text-red-500">*</span>
         </label>
         <InputText
@@ -80,8 +82,13 @@ export default function PersonalDataSection({
         )}
       </div>
 
-      <div className="field">
-        <label htmlFor="secondLastName">Segundo Apellido</label>
+      <div className="field col-12 md:col-6 lg:col-3">
+        <label
+          htmlFor="secondLastName"
+          className="font-medium text-900 block mb-2"
+        >
+          Segundo Apellido
+        </label>
         <InputText
           id="secondLastName"
           {...register("secondLastName")}
@@ -89,9 +96,12 @@ export default function PersonalDataSection({
         />
       </div>
 
-      {/* Row 2: Document */}
-      <div className="field">
-        <label htmlFor="documentType">
+      {/* Identidad y Nacimiento */}
+      <div className="field col-12 md:col-6 lg:col-3">
+        <label
+          htmlFor="documentType"
+          className="font-medium text-900 block mb-2"
+        >
           Tipo de Documento <span className="text-red-500">*</span>
         </label>
         <Controller
@@ -111,8 +121,11 @@ export default function PersonalDataSection({
         )}
       </div>
 
-      <div className="field">
-        <label htmlFor="documentNumber">
+      <div className="field col-12 md:col-6 lg:col-3">
+        <label
+          htmlFor="documentNumber"
+          className="font-medium text-900 block mb-2"
+        >
           Número de Documento <span className="text-red-500">*</span>
         </label>
         <Controller
@@ -132,9 +145,8 @@ export default function PersonalDataSection({
         )}
       </div>
 
-      {/* Row 3: Birth Data */}
-      <div className="field">
-        <label htmlFor="birthDate">
+      <div className="field col-12 md:col-6 lg:col-3">
+        <label htmlFor="birthDate" className="font-medium text-900 block mb-2">
           Fecha de Nacimiento <span className="text-red-500">*</span>
         </label>
         <Controller
@@ -160,8 +172,8 @@ export default function PersonalDataSection({
         )}
       </div>
 
-      <div className="field">
-        <label htmlFor="gender">
+      <div className="field col-12 md:col-6 lg:col-3">
+        <label htmlFor="gender" className="font-medium text-900 block mb-2">
           Género <span className="text-red-500">*</span>
         </label>
         <Controller
@@ -176,7 +188,7 @@ export default function PersonalDataSection({
               optionLabel="label"
               optionValue="value"
               placeholder="Seleccionar"
-              className={classNames({ "p-invalid": errors.gender })}
+              className={classNames("w-full", { "p-invalid": errors.gender })}
             />
           )}
         />
@@ -185,9 +197,9 @@ export default function PersonalDataSection({
         )}
       </div>
 
-      {/* Row 4: Contact & Birth Place */}
-      <div className="field">
-        <label htmlFor="phone">
+      {/* Contacto y Dirección */}
+      <div className="field col-12 md:col-6 lg:col-3">
+        <label htmlFor="phone" className="font-medium text-900 block mb-2">
           Teléfono <span className="text-red-500">*</span>
         </label>
         <Controller
@@ -207,8 +219,10 @@ export default function PersonalDataSection({
         )}
       </div>
 
-      <div className="field">
-        <label htmlFor="email">Correo Electrónico</label>
+      <div className="field col-12 md:col-6 lg:col-4">
+        <label htmlFor="email" className="font-medium text-900 block mb-2">
+          Correo Electrónico
+        </label>
         <InputText
           id="email"
           type="email"
@@ -221,9 +235,8 @@ export default function PersonalDataSection({
         )}
       </div>
 
-      {/* Row 5: Address */}
-      <div className="field col-span-full md:col-span-1">
-        <label htmlFor="address">
+      <div className="field col-12 md:col-6 lg:col-5">
+        <label htmlFor="address" className="font-medium text-900 block mb-2">
           Dirección <span className="text-red-500">*</span>
         </label>
         <InputText
@@ -237,8 +250,11 @@ export default function PersonalDataSection({
         )}
       </div>
 
-      <div className="field">
-        <label htmlFor="birthPlace">Lugar de Nacimiento</label>
+      {/* Otros Datos */}
+      <div className="field col-12 md:col-6 lg:col-3">
+        <label htmlFor="birthPlace" className="font-medium text-900 block mb-2">
+          Lugar de Nacimiento
+        </label>
         <InputText
           id="birthPlace"
           {...register("birthPlace")}
@@ -246,9 +262,13 @@ export default function PersonalDataSection({
         />
       </div>
 
-      {/* Row 6: Additional Personal Info */}
-      <div className="field">
-        <label htmlFor="nationality">Nacionalidad</label>
+      <div className="field col-12 md:col-6 lg:col-3">
+        <label
+          htmlFor="nationality"
+          className="font-medium text-900 block mb-2"
+        >
+          Nacionalidad
+        </label>
         <InputText
           id="nationality"
           {...register("nationality")}
@@ -256,8 +276,13 @@ export default function PersonalDataSection({
         />
       </div>
 
-      <div className="field">
-        <label htmlFor="maritalStatus">Estado Civil</label>
+      <div className="field col-12 md:col-6 lg:col-3">
+        <label
+          htmlFor="maritalStatus"
+          className="font-medium text-900 block mb-2"
+        >
+          Estado Civil
+        </label>
         <Controller
           name="maritalStatus"
           control={control}
@@ -270,14 +295,16 @@ export default function PersonalDataSection({
               optionLabel="label"
               optionValue="value"
               placeholder="Seleccionar"
+              className="w-full"
             />
           )}
         />
       </div>
 
-      {/* Row 7: Dependents */}
-      <div className="field">
-        <label htmlFor="dependents">Cargas Familiares</label>
+      <div className="field col-12 md:col-6 lg:col-3">
+        <label htmlFor="dependents" className="font-medium text-900 block mb-2">
+          Cargas Familiares
+        </label>
         <Controller
           name="dependents"
           control={control}
@@ -289,6 +316,7 @@ export default function PersonalDataSection({
               min={0}
               max={20}
               placeholder="0"
+              className="w-full"
             />
           )}
         />
