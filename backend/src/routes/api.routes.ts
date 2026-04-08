@@ -1,9 +1,9 @@
 import { Router } from 'express'
-import userRoutes from './users.routes.js'
-import authRoutes from './auth.routes.js'
-import companyRoutes from './companies.routes.js'
-import companyRoleRoutes from './companyRoles.routes.js'
-import membershipRoutes from './memberships.routes.js'
+import authRoutes from '../modules/auth/auth.routes.js'
+import userRoutes from '../modules/users/users.routes.js'
+import companyRoutes from '../modules/companies/companies.routes.js'
+import companyRoleRoutes from '../modules/company-roles/companyRoles.routes.js'
+import membershipRoutes from '../modules/memberships/memberships.routes.js'
 
 // Middlewares
 import { authenticate } from '../shared/middleware/authenticate.middleware.js'

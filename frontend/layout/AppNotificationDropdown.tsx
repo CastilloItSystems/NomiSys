@@ -1,5 +1,5 @@
 import React, { useRef, useState } from "react";
-import { useNotifications } from "@/hooks/useNotifications";
+import { useNotifications } from "@/shared/hooks/useNotifications";
 import { StyleClass } from "primereact/styleclass";
 import { Ripple } from "primereact/ripple";
 import { Badge } from "primereact/badge";
@@ -8,8 +8,8 @@ import { Avatar } from "primereact/avatar";
 import { ProgressSpinner } from "primereact/progressspinner";
 import { Tag } from "primereact/tag";
 import { TabView, TabPanel } from "primereact/tabview";
-import { useSocket } from "@/hooks/useSocket";
-import { marcarNotificacionLeida } from "@/app/api/notificacionService";
+import { useSocket } from "@/shared/hooks/useSocket";
+import { marcarNotificacionLeida } from "@/shared/services/notificacion.service";
 
 interface AppNotificationDropdownProps {
   session: any;

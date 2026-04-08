@@ -1,6 +1,6 @@
 import axios from "axios";
 import { getSession, signIn, signOut } from "next-auth/react";
-import { useEmpresasStore } from "@/store/empresasStore";
+import { useEmpresasStore } from "@/modules/companies/store/empresasStore";
 
 interface ExtendedUser {
   token: string;

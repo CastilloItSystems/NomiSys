@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import UnderConstruction from "@/components/common/UnderConstruction";
+import UnderConstruction from "@/shared/components/UnderConstruction";
 
 const DashboardSalesPage = () => {
   return (

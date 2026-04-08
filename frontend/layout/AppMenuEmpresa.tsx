@@ -1,6 +1,6 @@
 import AppSubMenu from "./AppSubMenu";
 import type { MenuModel } from "@/types";
-import { useEmpresasStore } from "@/store/empresasStore";
+import { useEmpresasStore } from "@/modules/companies/store/empresasStore";
 
 const AppMenuEmpresa = () => {
   const { activeEmpresa } = useEmpresasStore();

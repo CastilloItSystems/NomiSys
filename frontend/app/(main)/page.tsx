@@ -1,6 +1,6 @@
 "use client";
 
-import DashboardMain from "@/components/dashboardOpComponents/DashboardMain";
+import DashboardMain from "@/shared/components/DashboardMain";
 
 function Dashboard() {
   return (

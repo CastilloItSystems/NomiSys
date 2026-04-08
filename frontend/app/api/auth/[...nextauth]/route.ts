@@ -1,7 +1,11 @@
 import NextAuth, { DefaultSession } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
-import { getUser, googleSingIn, loginUser } from "../../userService";
-import { Usuario } from "@/libs/interfaces";
+import {
+  getUser,
+  googleSingIn,
+  loginUser,
+} from "@/modules/users/services/user.service";
+import { Usuario } from "@/modules/auth/interfaces/auth.interface";
 import GoogleProvider from "next-auth/providers/google";
 declare module "next-auth" {
   interface Session {

@@ -4,7 +4,7 @@ import React, { useContext, useEffect, useState } from "react";
 import type { AppBreadcrumbProps, Breadcrumb } from "@/types";
 import { LayoutContext } from "./context/layoutcontext";
 import Link from "next/link";
-import { useEmpresasStore } from "@/store/empresasStore";
+import { useEmpresasStore } from "@/modules/companies/store/empresasStore";
 
 const AppBreadcrumb = (props: AppBreadcrumbProps) => {
   const pathname = usePathname();

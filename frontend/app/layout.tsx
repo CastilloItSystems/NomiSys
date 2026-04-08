@@ -1,5 +1,5 @@
 import { cookies } from "next/headers";
-import ClientProviders from "@/components/common/ClientProviders";
+import ClientProviders from "@/shared/components/ClientProviders";
 import "../styles/layout/layout.scss";
 import "primeflex/primeflex.css";
 import "primeicons/primeicons.css";

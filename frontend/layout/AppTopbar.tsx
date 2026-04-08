@@ -15,10 +15,10 @@ import { usePathname, useRouter } from "next/navigation";
 import { classNames } from "primereact/utils";
 import { signOut, useSession } from "next-auth/react";
 import { User } from "next-auth";
-import { useSocket } from "@/hooks/useSocket";
+import { useSocket } from "@/shared/hooks/useSocket";
 import AppNotificationDropdown from "./AppNotificationDropdown";
 import { Dialog } from "primereact/dialog";
-import { useEmpresasStore } from "@/store/empresasStore";
+import { useEmpresasStore } from "@/modules/companies/store/empresasStore";
 
 interface ExtendedUser extends User {
   usuario: {

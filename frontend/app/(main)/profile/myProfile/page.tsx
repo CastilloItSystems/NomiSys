@@ -1,5 +1,5 @@
 "use client";
-import MyProfileList from "@/components/profile/MyprofileList";
+import MyProfileList from "@/modules/users/components/MyprofileList";
 import { Page } from "../../../../types/layout";
 
 const Myprofile: Page = () => {
