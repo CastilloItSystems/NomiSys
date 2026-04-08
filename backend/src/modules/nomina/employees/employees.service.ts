@@ -5,10 +5,72 @@ import {
   EmployeeDTO,
   ListEmployeesFiltersInterface,
   ListEmployeesResponseInterface,
+  fieldNameMap,
 } from './employees.types.js'
 import { logger } from '../../../shared/utils/logger.js'
 
 export class EmployeesService {
+  /**
+   * Normalize employee data: convert field aliases to canonical names
+   * All values are expected to be in English already
+   */
+  private normalizeEmployeeData(
+    data: any
+  ): CreateEmployeeDTO | UpdateEmployeeDTO {
+    const normalized = { ...data }
+
+    // Normalize field aliases
+    if (normalized.workShift && !normalized.workSchedule) {
+      normalized.workSchedule = normalized.workShift
+    }
+    if (normalized.payFrequency && !normalized.paymentFrequency) {
+      normalized.paymentFrequency = normalized.payFrequency
+    }
+    if (normalized.salaryAmount && !normalized.currentSalary) {
+      normalized.currentSalary = normalized.salaryAmount
+    }
+    if (
+      normalized.isFaovEnrolled !== undefined &&
+      normalized.faovRegistered === undefined
+    ) {
+      normalized.faovRegistered = normalized.isFaovEnrolled
+    }
+    if (
+      normalized.isIncesEnrolled !== undefined &&
+      normalized.incesRegistered === undefined
+    ) {
+      normalized.incesRegistered = normalized.isIncesEnrolled
+    }
+    if (
+      normalized.dependents !== undefined &&
+      normalized.familyCharges === undefined
+    ) {
+      normalized.familyCharges = normalized.dependents
+    }
+
+    // Remove aliases
+    delete normalized.workShift
+    delete normalized.payFrequency
+    delete normalized.salaryAmount
+    delete normalized.isFaovEnrolled
+    delete normalized.isIncesEnrolled
+    delete normalized.dependents
+
+    // Remove unsupported extra fields
+    delete normalized.middleName
+    delete normalized.secondLastName
+    delete normalized.maritalStatus
+    delete normalized.nationality
+    delete normalized.birthPlace
+    delete normalized.costCenter
+    delete normalized.currency
+    delete normalized.emergencyContactName
+    delete normalized.emergencyContactPhone
+    delete normalized.observations
+
+    return normalized
+  }
+
   /**
    * Create a new employee with initial salary and job info records
    */
@@ -18,40 +80,46 @@ export class EmployeesService {
     userId?: string
   ): Promise<EmployeeDTO> {
     try {
+      // Normalize incoming data (field aliases → canonical names)
+      const normalizedData = this.normalizeEmployeeData(
+        data
+      ) as CreateEmployeeDTO
+
       // Create employee and related records in a transaction
       const result = await prisma.$transaction(async (tx) => {
         // 1. Create Employee record
         const employee = await tx.employee.create({
           data: {
             companyId,
-            firstName: data.firstName,
-            lastName: data.lastName,
-            documentType: data.documentType,
-            documentNumber: data.documentNumber,
-            birthDate: new Date(data.birthDate),
-            gender: data.gender,
-            phone: data.phone,
-            email: data.email,
-            address: data.address,
-            employeeCode: data.employeeCode,
-            hireDate: new Date(data.hireDate),
-            departmentId: data.departmentId,
-            positionId: data.positionId,
-            contractType: data.contractType,
-            workSchedule: data.workSchedule,
-            currentSalary: data.currentSalary,
-            salaryType: data.salaryType || 'Mensual',
-            paymentFrequency: data.paymentFrequency || 'Mensual',
-            supervisorId: data.supervisorId || null,
-            ivssNumber: data.ivssNumber || null,
-            rifNumber: data.rifNumber || null,
-            faovRegistered: data.faovRegistered ?? false,
-            incesRegistered: data.incesRegistered ?? false,
-            familyCharges: data.familyCharges ?? 0,
-            bankId: data.bankId,
-            accountType: data.accountType,
-            accountNumber: data.accountNumber,
-            status: 'Activo',
+            firstName: normalizedData.firstName,
+            lastName: normalizedData.lastName,
+            documentType: normalizedData.documentType,
+            documentNumber: normalizedData.documentNumber,
+            birthDate: new Date(normalizedData.birthDate),
+            gender: normalizedData.gender,
+            phone: normalizedData.phone,
+            email: normalizedData.email,
+            address: normalizedData.address,
+            employeeCode: normalizedData.employeeCode,
+            hireDate: new Date(normalizedData.hireDate),
+            departmentId: normalizedData.departmentId,
+            positionId: normalizedData.positionId,
+            contractType: normalizedData.contractType as string,
+            workSchedule: normalizedData.workSchedule as string,
+            currentSalary: normalizedData.currentSalary,
+            salaryType: 'USD',
+            paymentFrequency:
+              (normalizedData.paymentFrequency as string) || 'MONTHLY',
+            supervisorId: normalizedData.supervisorId || null,
+            ivssNumber: normalizedData.ivssNumber || null,
+            rifNumber: normalizedData.rifNumber || null,
+            faovRegistered: normalizedData.faovRegistered ?? false,
+            incesRegistered: normalizedData.incesRegistered ?? false,
+            familyCharges: normalizedData.familyCharges ?? 0,
+            bankId: normalizedData.bankId,
+            accountType: normalizedData.accountType as string,
+            accountNumber: normalizedData.accountNumber,
+            status: 'ACTIVE',
             isActive: true,
           },
         })
@@ -60,11 +128,11 @@ export class EmployeesService {
         await tx.employeeSalaryHistory.create({
           data: {
             employeeId: employee.id,
-            salary: data.currentSalary,
-            salaryType: 'VES', // Default to VES (Venezuelan Bolívares)
-            effectiveDate: new Date(data.hireDate),
+            salary: normalizedData.currentSalary,
+            salaryType: 'USD',
+            effectiveDate: new Date(normalizedData.hireDate),
             previousSalary: 0,
-            reason: 'Creación de empleado - Salario inicial',
+            reason: 'Employee creation - Initial salary',
           },
         })
 
@@ -72,9 +140,9 @@ export class EmployeesService {
         await tx.employeeJobInfo.create({
           data: {
             employeeId: employee.id,
-            departmentId: data.departmentId,
-            positionId: data.positionId,
-            effectiveDate: new Date(data.hireDate),
+            departmentId: normalizedData.departmentId,
+            positionId: normalizedData.positionId,
+            effectiveDate: new Date(normalizedData.hireDate),
             endDate: null, // NULL indicates current assignment
           },
         })
@@ -88,7 +156,7 @@ export class EmployeesService {
             changes: JSON.parse(
               JSON.stringify({
                 before: {},
-                after: data,
+                after: normalizedData,
               })
             ),
             userId,
@@ -209,6 +277,11 @@ export class EmployeesService {
     userId?: string
   ): Promise<EmployeeDTO> {
     try {
+      // Normalize incoming data (field aliases → canonical names)
+      const normalizedData = this.normalizeEmployeeData(
+        data
+      ) as UpdateEmployeeDTO
+
       const result = await prisma.$transaction(async (tx) => {
         // Get current employee
         const currentEmployee = await tx.employee.findFirst({
@@ -225,119 +298,125 @@ export class EmployeesService {
 
         // Track changes
         if (
-          data.firstName !== undefined &&
-          data.firstName !== currentEmployee.firstName
+          normalizedData.firstName !== undefined &&
+          normalizedData.firstName !== currentEmployee.firstName
         ) {
-          updateData.firstName = data.firstName
+          updateData.firstName = normalizedData.firstName
           changes.before.firstName = currentEmployee.firstName
-          changes.after.firstName = data.firstName
+          changes.after.firstName = normalizedData.firstName
         }
         if (
-          data.lastName !== undefined &&
-          data.lastName !== currentEmployee.lastName
+          normalizedData.lastName !== undefined &&
+          normalizedData.lastName !== currentEmployee.lastName
         ) {
-          updateData.lastName = data.lastName
+          updateData.lastName = normalizedData.lastName
           changes.before.lastName = currentEmployee.lastName
-          changes.after.lastName = data.lastName
+          changes.after.lastName = normalizedData.lastName
         }
-        if (data.email !== undefined && data.email !== currentEmployee.email) {
-          updateData.email = data.email
+        if (
+          normalizedData.email !== undefined &&
+          normalizedData.email !== currentEmployee.email
+        ) {
+          updateData.email = normalizedData.email
           changes.before.email = currentEmployee.email
-          changes.after.email = data.email
+          changes.after.email = normalizedData.email
         }
-        if (data.phone !== undefined && data.phone !== currentEmployee.phone) {
-          updateData.phone = data.phone
+        if (
+          normalizedData.phone !== undefined &&
+          normalizedData.phone !== currentEmployee.phone
+        ) {
+          updateData.phone = normalizedData.phone
           changes.before.phone = currentEmployee.phone
-          changes.after.phone = data.phone
+          changes.after.phone = normalizedData.phone
         }
         if (
-          data.address !== undefined &&
-          data.address !== currentEmployee.address
+          normalizedData.address !== undefined &&
+          normalizedData.address !== currentEmployee.address
         ) {
-          updateData.address = data.address
+          updateData.address = normalizedData.address
           changes.before.address = currentEmployee.address
-          changes.after.address = data.address
+          changes.after.address = normalizedData.address
         }
         if (
-          data.contractType !== undefined &&
-          data.contractType !== currentEmployee.contractType
+          normalizedData.contractType !== undefined &&
+          normalizedData.contractType !== currentEmployee.contractType
         ) {
-          updateData.contractType = data.contractType
+          updateData.contractType = normalizedData.contractType
           changes.before.contractType = currentEmployee.contractType
-          changes.after.contractType = data.contractType
+          changes.after.contractType = normalizedData.contractType
         }
         if (
-          data.workSchedule !== undefined &&
-          data.workSchedule !== currentEmployee.workSchedule
+          normalizedData.workSchedule !== undefined &&
+          normalizedData.workSchedule !== currentEmployee.workSchedule
         ) {
-          updateData.workSchedule = data.workSchedule
+          updateData.workSchedule = normalizedData.workSchedule
           changes.before.workSchedule = currentEmployee.workSchedule
-          changes.after.workSchedule = data.workSchedule
+          changes.after.workSchedule = normalizedData.workSchedule
         }
         if (
-          data.supervisorId !== undefined &&
-          data.supervisorId !== currentEmployee.supervisorId
+          normalizedData.supervisorId !== undefined &&
+          normalizedData.supervisorId !== currentEmployee.supervisorId
         ) {
-          updateData.supervisorId = data.supervisorId || null
+          updateData.supervisorId = normalizedData.supervisorId || null
           changes.before.supervisorId = currentEmployee.supervisorId
-          changes.after.supervisorId = data.supervisorId
+          changes.after.supervisorId = normalizedData.supervisorId
         }
 
         // Handle salary change - create history record
         if (
-          data.currentSalary !== undefined &&
-          data.currentSalary !== Number(currentEmployee.currentSalary)
+          normalizedData.currentSalary !== undefined &&
+          normalizedData.currentSalary !== Number(currentEmployee.currentSalary)
         ) {
-          updateData.currentSalary = data.currentSalary
+          updateData.currentSalary = normalizedData.currentSalary
           changes.before.currentSalary = currentEmployee.currentSalary
-          changes.after.currentSalary = data.currentSalary
+          changes.after.currentSalary = normalizedData.currentSalary
 
           await tx.employeeSalaryHistory.create({
             data: {
               employeeId,
-              salary: data.currentSalary,
-              salaryType: 'VES',
+              salary: normalizedData.currentSalary,
+              salaryType: 'USD',
               effectiveDate: new Date(),
               previousSalary: currentEmployee.currentSalary,
-              reason: 'Cambio de salario',
+              reason: 'Salary change',
             },
           })
         }
 
         if (
-          data.paymentFrequency !== undefined &&
-          data.paymentFrequency !== currentEmployee.paymentFrequency
+          normalizedData.paymentFrequency !== undefined &&
+          normalizedData.paymentFrequency !== currentEmployee.paymentFrequency
         ) {
-          updateData.paymentFrequency = data.paymentFrequency
+          updateData.paymentFrequency = normalizedData.paymentFrequency
           changes.before.paymentFrequency = currentEmployee.paymentFrequency
-          changes.after.paymentFrequency = data.paymentFrequency
+          changes.after.paymentFrequency = normalizedData.paymentFrequency
         }
 
         // Venezuela-specific fields
-        if (data.ivssNumber !== undefined) {
-          updateData.ivssNumber = data.ivssNumber
+        if (normalizedData.ivssNumber !== undefined) {
+          updateData.ivssNumber = normalizedData.ivssNumber
           changes.before.ivssNumber = currentEmployee.ivssNumber
-          changes.after.ivssNumber = data.ivssNumber
+          changes.after.ivssNumber = normalizedData.ivssNumber
         }
-        if (data.rifNumber !== undefined) {
-          updateData.rifNumber = data.rifNumber
+        if (normalizedData.rifNumber !== undefined) {
+          updateData.rifNumber = normalizedData.rifNumber
           changes.before.rifNumber = currentEmployee.rifNumber
-          changes.after.rifNumber = data.rifNumber
+          changes.after.rifNumber = normalizedData.rifNumber
         }
-        if (data.faovRegistered !== undefined) {
-          updateData.faovRegistered = data.faovRegistered
+        if (normalizedData.faovRegistered !== undefined) {
+          updateData.faovRegistered = normalizedData.faovRegistered
           changes.before.faovRegistered = currentEmployee.faovRegistered
-          changes.after.faovRegistered = data.faovRegistered
+          changes.after.faovRegistered = normalizedData.faovRegistered
         }
-        if (data.incesRegistered !== undefined) {
-          updateData.incesRegistered = data.incesRegistered
+        if (normalizedData.incesRegistered !== undefined) {
+          updateData.incesRegistered = normalizedData.incesRegistered
           changes.before.incesRegistered = currentEmployee.incesRegistered
-          changes.after.incesRegistered = data.incesRegistered
+          changes.after.incesRegistered = normalizedData.incesRegistered
         }
-        if (data.familyCharges !== undefined) {
-          updateData.familyCharges = data.familyCharges
+        if (normalizedData.familyCharges !== undefined) {
+          updateData.familyCharges = normalizedData.familyCharges
           changes.before.familyCharges = currentEmployee.familyCharges
-          changes.after.familyCharges = data.familyCharges
+          changes.after.familyCharges = normalizedData.familyCharges
         }
 
         // Banking information
@@ -606,7 +685,6 @@ export class EmployeesService {
       contractType: employee.contractType,
       workSchedule: employee.workSchedule,
       currentSalary: employee.currentSalary,
-      salaryType: employee.salaryType,
       paymentFrequency: employee.paymentFrequency,
       supervisorId: employee.supervisorId,
       ivssNumber: employee.ivssNumber,

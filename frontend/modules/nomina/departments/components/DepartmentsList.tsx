@@ -1,180 +1,77 @@
 "use client";
 
-import { useRef, useState, useEffect } from "react";
-import { useForm, Controller } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
+import { useRef, useState } from "react";
 import { Dialog } from "primereact/dialog";
 import { DataTable } from "primereact/datatable";
 import { Column } from "primereact/column";
 import { Button } from "primereact/button";
-import { Toast } from "primereact/toast";
 import { InputText } from "primereact/inputtext";
-import { InputSwitch } from "primereact/inputswitch";
+import { Toast } from "primereact/toast";
 import { Menu } from "primereact/menu";
+import type { MenuItem } from "primereact/menuitem";
 import { classNames } from "primereact/utils";
+import CreateButton from "@/shared/components/CreateButton";
+import DeleteConfirmDialog from "@/shared/components/DeleteConfirmDialog";
+import FormActionButtons from "@/shared/components/FormActionButtons";
+import DepartmentForm from "./DepartmentForm";
 import { useDepartmentsData } from "@/modules/nomina/departments/hooks/useDepartmentsData";
-import {
-  createDepartment,
-  updateDepartment,
-  deleteDepartment,
-} from "@/modules/nomina/departments/services/department.service";
-import {
-  createDepartmentSchema,
-  CreateDepartmentFormData,
-} from "@/modules/nomina/departments/schemas/department.schema";
+import { deleteDepartment } from "@/modules/nomina/departments/services/department.service";
 import { Department } from "@/modules/nomina/departments/interfaces/department.interface";
 import { handleFormError } from "@/utils/errorHandlers";
 
-interface DepartmentFormProps {
-  department?: Department | null;
-  onSave: () => void;
-  onCancel: () => void;
-  formId?: string;
-}
-
-const DepartmentForm = ({
-  department,
-  onSave,
-  onCancel,
-  formId = "department-form",
-}: DepartmentFormProps) => {
-  const toast = useRef<Toast>(null);
-  const [isSubmitting, setIsSubmitting] = useState(false);
-
-  const {
-    control,
-    register,
-    handleSubmit,
-    formState: { errors },
-    reset,
-  } = useForm<CreateDepartmentFormData>({
-    resolver: zodResolver(createDepartmentSchema),
-    mode: "onBlur",
-  });
-
-  useEffect(() => {
-    if (department) {
-      reset({
-        name: department.name,
-        code: department.code || "",
-        description: department.description || "",
-        isActive: department.isActive,
-      });
-    } else {
-      reset({
-        name: "",
-        code: "",
-        description: "",
-        isActive: true,
-      });
-    }
-  }, [department, reset]);
-
-  const onSubmit = async (data: CreateDepartmentFormData) => {
-    try {
-      setIsSubmitting(true);
-      if (department?.id) {
-        await updateDepartment(department.id, data);
-        toast.current?.show({
-          severity: "success",
-          summary: "Éxito",
-          detail: "Departamento actualizado",
-          life: 3000,
-        });
-      } else {
-        await createDepartment(data);
-        toast.current?.show({
-          severity: "success",
-          summary: "Éxito",
-          detail: "Departamento creado",
-          life: 3000,
-        });
-      }
-      onSave();
-    } catch (error) {
-      handleFormError(error, toast);
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
-
-  return (
-    <>
-      <Toast ref={toast} />
-      <form onSubmit={handleSubmit(onSubmit)} id={formId}>
-        <div className="field">
-          <label htmlFor="name">
-            Nombre <span className="text-red-500">*</span>
-          </label>
-          <InputText
-            id="name"
-            {...register("name")}
-            className={classNames({ "p-invalid": errors.name })}
-            placeholder="Ej: Ventas"
-          />
-          {errors.name && (
-            <small className="p-error">{errors.name.message}</small>
-          )}
-        </div>
-
-        <div className="field">
-          <label htmlFor="code">Código</label>
-          <InputText
-            id="code"
-            {...register("code")}
-            className={classNames({ "p-invalid": errors.code })}
-            placeholder="Ej: VTA"
-            maxLength={20}
-          />
-          {errors.code && (
-            <small className="p-error">{errors.code.message}</small>
-          )}
-        </div>
-
-        <div className="field">
-          <label htmlFor="description">Descripción</label>
-          <InputText
-            id="description"
-            {...register("description")}
-            className={classNames({ "p-invalid": errors.description })}
-            placeholder="Descripción opcional"
-            maxLength={500}
-          />
-          {errors.description && (
-            <small className="p-error">{errors.description.message}</small>
-          )}
-        </div>
-
-        <div className="field">
-          <label htmlFor="isActive">Activo</label>
-          <Controller
-            name="isActive"
-            control={control}
-            render={({ field }) => (
-              <InputSwitch
-                id="isActive"
-                checked={field.value}
-                onChange={(e) => field.onChange(e.value)}
-              />
-            )}
-          />
-        </div>
-      </form>
-    </>
-  );
-};
-
 export default function DepartmentsList() {
+  // ──────────────────────────────────────────────────────────────────
+  // REFS & HOOKS
+  // ──────────────────────────────────────────────────────────────────
   const toast = useRef<Toast>(null);
-  const { departments, loading, mutate } = useDepartmentsData();
+  const menuRef = useRef<Menu>(null);
+  const [searchQuery, setSearchQuery] = useState("");
+  const { departments, total, loading, mutate } = useDepartmentsData(
+    searchQuery || undefined,
+  );
 
+  // ──────────────────────────────────────────────────────────────────
+  // STATE
+  // ──────────────────────────────────────────────────────────────────
   const [selectedDepartment, setSelectedDepartment] =
     useState<Department | null>(null);
+  const [actionItem, setActionItem] = useState<Department | null>(null);
   const [departmentFormDialog, setDepartmentFormDialog] = useState(false);
-  const [deleteDepartmentDialog, setDeleteDepartmentDialog] = useState(false);
+  const [deleteDialog, setDeleteDialog] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
-  const [globalFilterValue, setGlobalFilterValue] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
+  // ──────────────────────────────────────────────────────────────────
+  // SEARCH HANDLER
+  // ──────────────────────────────────────────────────────────────────
+  const handleSearch = (query: string) => {
+    setSearchQuery(query);
+  };
+  // MENU ITEMS
+  // ──────────────────────────────────────────────────────────────────
+  const getMenuItems = (dept: Department | null): MenuItem[] => {
+    if (!dept) return [];
+    return [
+      {
+        label: "Editar",
+        icon: "pi pi-pencil",
+        command: () => editDepartment(dept),
+      },
+      {
+        separator: true,
+      },
+      {
+        label: "Eliminar",
+        icon: "pi pi-trash",
+        className: "p-menuitem-danger",
+        command: () => confirmDeleteDepartment(dept),
+      },
+    ];
+  };
+
+  // ──────────────────────────────────────────────────────────────────
+  // HANDLERS
+  // ──────────────────────────────────────────────────────────────────
   const editDepartment = (dept: Department) => {
     setSelectedDepartment(dept);
     setDepartmentFormDialog(true);
@@ -182,7 +79,7 @@ export default function DepartmentsList() {
 
   const confirmDeleteDepartment = (dept: Department) => {
     setSelectedDepartment(dept);
-    setDeleteDepartmentDialog(true);
+    setDeleteDialog(true);
   };
 
   const deleteDept = async () => {
@@ -196,7 +93,8 @@ export default function DepartmentsList() {
         detail: "Departamento eliminado",
         life: 3000,
       });
-      setDeleteDepartmentDialog(false);
+      setDeleteDialog(false);
+      setSelectedDepartment(null);
       mutate();
     } catch (error) {
       handleFormError(error, toast);
@@ -210,55 +108,80 @@ export default function DepartmentsList() {
     setDepartmentFormDialog(false);
   };
 
+  const handleSave = async () => {
+    toast.current?.show({
+      severity: "success",
+      summary: "Éxito",
+      detail: selectedDepartment?.id
+        ? "Departamento actualizado correctamente"
+        : "Departamento creado correctamente",
+      life: 3000,
+    });
+    await mutate();
+    hideFormDialog();
+  };
+
+  const openNew = () => {
+    setSelectedDepartment(null);
+    setDepartmentFormDialog(true);
+  };
+
+  // ──────────────────────────────────────────────────────────────────
+  // ACTION TEMPLATE
+  // ──────────────────────────────────────────────────────────────────
   const actionBodyTemplate = (rowData: Department) => {
     return (
-      <Button
-        icon="pi pi-ellipsis-v"
-        rounded
-        text
-        onClick={(e) => {
-          const menuItems = [
-            {
-              label: "Editar",
-              icon: "pi pi-pencil",
-              command: () => editDepartment(rowData),
-            },
-            {
-              label: "Eliminar",
-              icon: "pi pi-trash",
-              className: "p-error",
-              command: () => confirmDeleteDepartment(rowData),
-            },
-          ];
-          setSelectedDepartment(rowData);
-          e.currentTarget.parentElement?.querySelector("button")?.click();
+      <i
+        className="pi pi-cog cursor-pointer text-primary"
+        onClick={(e: any) => {
+          setActionItem(rowData);
+          menuRef.current?.toggle(e);
         }}
+        style={{ fontSize: "1.2rem" }}
+        title="Opciones"
       />
     );
   };
 
   return (
     <>
+      {/* ──────────────────────────────────────────────────────────────────── */}
+      {/* NOTIFICATIONS & STATE */}
+      {/* ──────────────────────────────────────────────────────────────────── */}
       <Toast ref={toast} />
 
-      <div className="flex align-items-center justify-content-between mb-4">
-        <h3>Departamentos</h3>
-        <Button
-          label="Nuevo Departamento"
-          icon="pi pi-plus"
-          onClick={() => {
-            setSelectedDepartment(null);
-            setDepartmentFormDialog(true);
-          }}
-        />
-      </div>
-
+      {/* ──────────────────────────────────────────────────────────────────── */}
+      {/* DATATABLE: LIST VIEW */}
+      {/* ──────────────────────────────────────────────────────────────────── */}
       <DataTable
         value={departments}
         loading={loading}
         paginator
         rows={10}
+        rowsPerPageOptions={[5, 10, 25, 50]}
+        dataKey="id"
         scrollable
+        sortMode="multiple"
+        header={
+          <div className="flex flex-wrap gap-2 align-items-center justify-content-between">
+            <div className="flex align-items-center gap-2">
+              <h4 className="m-0">Departamentos</h4>
+              <span className="text-600 text-sm">({total} total)</span>
+            </div>
+            <div className="flex gap-2">
+              <span className="p-input-icon-left">
+                <i className="pi pi-search" />
+                <InputText
+                  type="search"
+                  placeholder="Buscar..."
+                  value={searchQuery}
+                  onChange={(e) => handleSearch(e.target.value)}
+                />
+              </span>
+              <CreateButton label="Nuevo Departamento" onClick={openNew} />
+            </div>
+          </div>
+        }
         emptyMessage="Sin departamentos"
       >
         <Column field="name" header="Nombre" sortable />
@@ -278,66 +201,77 @@ export default function DepartmentsList() {
         <Column
           header="Acciones"
           body={actionBodyTemplate}
-          frozen
+          exportable={false}
+          frozen={true}
           alignFrozen="right"
+          style={{ width: "6rem", textAlign: "center" }}
+          headerStyle={{ textAlign: "center" }}
         />
       </DataTable>
 
+      {/* ──────────────────────────────────────────────────────────────────── */}
+      {/* CONTEXT MENU: FLOATING ACTIONS */}
+      {/* ──────────────────────────────────────────────────────────────────── */}
+      <Menu
+        ref={menuRef}
+        id="department-menu"
+        model={getMenuItems(actionItem)}
+        popup
+      />
+
+      {/* ──────────────────────────────────────────────────────────────────── */}
+      {/* DIALOG: CREATE/EDIT FORM */}
+      {/* ──────────────────────────────────────────────────────────────────── */}
       <Dialog
         visible={departmentFormDialog}
-        style={{ width: "500px" }}
-        header={
-          selectedDepartment ? "Editar Departamento" : "Nuevo Departamento"
-        }
         modal
+        maximizable
+        style={{ width: "75vw" }}
+        breakpoints={{ "1400px": "75vw", "900px": "85vw", "600px": "95vw" }}
         onHide={hideFormDialog}
-        footer={
-          <div className="flex gap-2 justify-content-end">
-            <Button label="Cancelar" onClick={hideFormDialog} />
-            <Button label="Guardar" form="department-form" />
+        header={
+          <div className="mb-2 text-center md:text-left">
+            <div className="border-bottom-2 border-primary pb-2">
+              <h2 className="text-2xl font-bold text-900 mb-2 flex align-items-center justify-content-center md:justify-content-start">
+                <i className="pi pi-sitemap mr-3 text-primary text-3xl"></i>
+                {selectedDepartment
+                  ? "Editar Departamento"
+                  : "Nuevo Departamento"}
+              </h2>
+            </div>
           </div>
+        }
+        footer={
+          <FormActionButtons
+            formId="department-form"
+            isUpdate={!!selectedDepartment?.id}
+            onCancel={hideFormDialog}
+            isSubmitting={isSubmitting}
+          />
         }
       >
         <DepartmentForm
           department={selectedDepartment}
-          onSave={() => {
-            hideFormDialog();
-            mutate();
-          }}
-          onCancel={hideFormDialog}
+          onSave={handleSave}
           formId="department-form"
+          onSubmittingChange={setIsSubmitting}
+          toast={toast}
         />
       </Dialog>
 
-      <Dialog
-        visible={deleteDepartmentDialog}
-        style={{ width: "450px" }}
-        header="Confirmar"
-        modal
-        footer={
-          <div className="flex gap-2 justify-content-end">
-            <Button
-              label="No"
-              onClick={() => setDeleteDepartmentDialog(false)}
-            />
-            <Button
-              label="Sí, eliminar"
-              severity="danger"
-              loading={isDeleting}
-              onClick={deleteDept}
-            />
-          </div>
-        }
-        onHide={() => setDeleteDepartmentDialog(false)}
-      >
-        <div className="flex gap-3 align-items-center">
-          <i className="pi pi-exclamation-triangle text-red-500 text-2xl" />
-          <span>
-            ¿Estás seguro de que deseas eliminar{" "}
-            <b>{selectedDepartment?.name}</b>?
-          </span>
-        </div>
-      </Dialog>
+      {/* ──────────────────────────────────────────────────────────────────── */}
+      {/* DIALOG: DELETE CONFIRMATION */}
+      {/* ──────────────────────────────────────────────────────────────────── */}
+      <DeleteConfirmDialog
+        visible={deleteDialog}
+        onHide={() => {
+          setDeleteDialog(false);
+          setSelectedDepartment(null);
+        }}
+        onConfirm={deleteDept}
+        itemName={selectedDepartment?.name}
+        isDeleting={isDeleting}
+      />
     </>
   );
 }

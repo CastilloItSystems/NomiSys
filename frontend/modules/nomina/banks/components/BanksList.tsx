@@ -1,162 +1,77 @@
 "use client";
 
-import { useRef, useState, useEffect } from "react";
-import { useForm, Controller } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
+import { useRef, useState } from "react";
 import { Dialog } from "primereact/dialog";
 import { DataTable } from "primereact/datatable";
 import { Column } from "primereact/column";
-import { Button } from "primereact/button";
-import { Toast } from "primereact/toast";
 import { InputText } from "primereact/inputtext";
-import { InputSwitch } from "primereact/inputswitch";
+import { Toast } from "primereact/toast";
+import { Menu } from "primereact/menu";
+import type { MenuItem } from "primereact/menuitem";
 import { classNames } from "primereact/utils";
+import CreateButton from "@/shared/components/CreateButton";
+import DeleteConfirmDialog from "@/shared/components/DeleteConfirmDialog";
+import FormActionButtons from "@/shared/components/FormActionButtons";
+import BankForm from "./BankForm";
 import { useBanksData } from "@/modules/nomina/banks/hooks/useBanksData";
-import {
-  createBank,
-  updateBank,
-  deleteBank,
-} from "@/modules/nomina/banks/services/bank.service";
-import {
-  createBankSchema,
-  CreateBankFormData,
-} from "@/modules/nomina/banks/schemas/bank.schema";
+import { deleteBank } from "@/modules/nomina/banks/services/bank.service";
 import { Bank } from "@/modules/nomina/banks/interfaces/bank.interface";
 import { handleFormError } from "@/utils/errorHandlers";
 
-interface BankFormProps {
-  bank?: Bank | null;
-  onSave: () => void;
-  onCancel: () => void;
-  formId?: string;
-}
-
-const BankForm = ({
-  bank,
-  onSave,
-  onCancel,
-  formId = "bank-form",
-}: BankFormProps) => {
+export default function BanksList() {
+  // ──────────────────────────────────────────────────────────────────
+  // REFS & HOOKS
+  // ──────────────────────────────────────────────────────────────────
   const toast = useRef<Toast>(null);
+  const menuRef = useRef<Menu>(null);
+  const [searchQuery, setSearchQuery] = useState("");
+  const { banks, total, loading, mutate } = useBanksData(
+    searchQuery || undefined,
+  );
+
+  // ──────────────────────────────────────────────────────────────────
+  // STATE
+  // ──────────────────────────────────────────────────────────────────
+  const [selectedBank, setSelectedBank] = useState<Bank | null>(null);
+  const [actionItem, setActionItem] = useState<Bank | null>(null);
+  const [bankFormDialog, setBankFormDialog] = useState(false);
+  const [deleteDialog, setDeleteDialog] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const {
-    register,
-    handleSubmit,
-    formState: { errors },
-    reset,
-  } = useForm<CreateBankFormData>({
-    resolver: zodResolver(createBankSchema),
-    mode: "onBlur",
-  });
-
-  useEffect(() => {
-    if (bank) {
-      reset({
-        name: bank.name,
-        code: bank.code,
-        isActive: bank.isActive,
-      });
-    } else {
-      reset({
-        name: "",
-        code: "",
-        isActive: true,
-      });
-    }
-  }, [bank, reset]);
-
-  const onSubmit = async (data: CreateBankFormData) => {
-    try {
-      setIsSubmitting(true);
-      if (bank?.id) {
-        await updateBank(bank.id, data);
-        toast.current?.show({
-          severity: "success",
-          summary: "Éxito",
-          detail: "Banco actualizado",
-          life: 3000,
-        });
-      } else {
-        await createBank(data);
-        toast.current?.show({
-          severity: "success",
-          summary: "Éxito",
-          detail: "Banco creado",
-          life: 3000,
-        });
-      }
-      onSave();
-    } catch (error) {
-      handleFormError(error, toast);
-    } finally {
-      setIsSubmitting(false);
-    }
+  // ──────────────────────────────────────────────────────────────────
+  // SEARCH HANDLER
+  // ──────────────────────────────────────────────────────────────────
+  const handleSearch = (query: string) => {
+    setSearchQuery(query);
   };
 
-  return (
-    <>
-      <Toast ref={toast} />
-      <form onSubmit={handleSubmit(onSubmit)} id={formId}>
-        <div className="field">
-          <label htmlFor="name">
-            Nombre <span className="text-red-500">*</span>
-          </label>
-          <InputText
-            id="name"
-            {...register("name")}
-            className={classNames({ "p-invalid": errors.name })}
-            placeholder="Ej: Banesco"
-          />
-          {errors.name && (
-            <small className="p-error">{errors.name.message}</small>
-          )}
-        </div>
+  // ──────────────────────────────────────────────────────────────────
+  // MENU ITEMS
+  // ──────────────────────────────────────────────────────────────────
+  const getMenuItems = (b: Bank | null): MenuItem[] => {
+    if (!b) return [];
+    return [
+      {
+        label: "Editar",
+        icon: "pi pi-pencil",
+        command: () => editBank(b),
+      },
+      {
+        separator: true,
+      },
+      {
+        label: "Eliminar",
+        icon: "pi pi-trash",
+        className: "p-menuitem-danger",
+        command: () => confirmDeleteBank(b),
+      },
+    ];
+  };
 
-        <div className="field">
-          <label htmlFor="code">
-            Código SUDEBAN <span className="text-red-500">*</span>
-          </label>
-          <InputText
-            id="code"
-            {...register("code")}
-            className={classNames({ "p-invalid": errors.code })}
-            placeholder="Ej: 0134"
-            maxLength={10}
-          />
-          {errors.code && (
-            <small className="p-error">{errors.code.message}</small>
-          )}
-        </div>
-
-        <div className="field">
-          <label htmlFor="isActive">Activo</label>
-          <Controller
-            name="isActive"
-            control={control}
-            render={({ field }) => (
-              <InputSwitch
-                id="isActive"
-                checked={field.value}
-                onChange={(e) => field.onChange(e.value)}
-              />
-            )}
-          />
-        </div>
-      </form>
-    </>
-  );
-};
-
-export default function BanksList() {
-  const toast = useRef<Toast>(null);
-  const { banks, loading, mutate } = useBanksData();
-
-  const [selectedBank, setSelectedBank] = useState<Bank | null>(null);
-  const [bankFormDialog, setBankFormDialog] = useState(false);
-  const [deleteBankDialog, setDeleteBankDialog] = useState(false);
-  const [isDeleting, setIsDeleting] = useState(false);
-
+  // ──────────────────────────────────────────────────────────────────
+  // HANDLERS
+  // ──────────────────────────────────────────────────────────────────
   const editBank = (b: Bank) => {
     setSelectedBank(b);
     setBankFormDialog(true);
@@ -164,7 +79,7 @@ export default function BanksList() {
 
   const confirmDeleteBank = (b: Bank) => {
     setSelectedBank(b);
-    setDeleteBankDialog(true);
+    setDeleteDialog(true);
   };
 
   const deleteB = async () => {
@@ -178,7 +93,8 @@ export default function BanksList() {
         detail: "Banco eliminado",
         life: 3000,
       });
-      setDeleteBankDialog(false);
+      setDeleteDialog(false);
+      setSelectedBank(null);
       mutate();
     } catch (error) {
       handleFormError(error, toast);
@@ -192,41 +108,80 @@ export default function BanksList() {
     setBankFormDialog(false);
   };
 
+  const handleSave = async () => {
+    toast.current?.show({
+      severity: "success",
+      summary: "Éxito",
+      detail: selectedBank?.id
+        ? "Banco actualizado correctamente"
+        : "Banco creado correctamente",
+      life: 3000,
+    });
+    await mutate();
+    hideFormDialog();
+  };
+
+  const openNew = () => {
+    setSelectedBank(null);
+    setBankFormDialog(true);
+  };
+
+  // ──────────────────────────────────────────────────────────────────
+  // ACTION TEMPLATE
+  // ──────────────────────────────────────────────────────────────────
   const actionBodyTemplate = (rowData: Bank) => {
     return (
-      <Button
-        icon="pi pi-ellipsis-v"
-        rounded
-        text
-        onClick={() => {
-          setSelectedBank(rowData);
+      <i
+        className="pi pi-cog cursor-pointer text-primary"
+        onClick={(e: any) => {
+          setActionItem(rowData);
+          menuRef.current?.toggle(e);
         }}
+        style={{ fontSize: "1.2rem" }}
+        title="Opciones"
       />
     );
   };
 
   return (
     <>
+      {/* ──────────────────────────────────────────────────────────────────── */}
+      {/* NOTIFICATIONS & STATE */}
+      {/* ──────────────────────────────────────────────────────────────────── */}
       <Toast ref={toast} />
 
-      <div className="flex align-items-center justify-content-between mb-4">
-        <h3>Bancos</h3>
-        <Button
-          label="Nuevo Banco"
-          icon="pi pi-plus"
-          onClick={() => {
-            setSelectedBank(null);
-            setBankFormDialog(true);
-          }}
-        />
-      </div>
-
+      {/* ──────────────────────────────────────────────────────────────────── */}
+      {/* DATATABLE: LIST VIEW */}
+      {/* ──────────────────────────────────────────────────────────────────── */}
       <DataTable
         value={banks}
         loading={loading}
         paginator
         rows={10}
+        rowsPerPageOptions={[5, 10, 25, 50]}
+        dataKey="id"
         scrollable
+        sortMode="multiple"
+        header={
+          <div className="flex flex-wrap gap-2 align-items-center justify-content-between">
+            <div className="flex align-items-center gap-2">
+              <h4 className="m-0">Bancos</h4>
+              <span className="text-600 text-sm">({total} total)</span>
+            </div>
+            <div className="flex gap-2">
+              <span className="p-input-icon-left">
+                <i className="pi pi-search" />
+                <InputText
+                  type="search"
+                  placeholder="Buscar..."
+                  value={searchQuery}
+                  onChange={(e) => handleSearch(e.target.value)}
+                />
+              </span>
+              <CreateButton label="Nuevo Banco" onClick={openNew} />
+            </div>
+          </div>
+        }
         emptyMessage="Sin bancos"
       >
         <Column field="name" header="Nombre" sortable />
@@ -246,60 +201,75 @@ export default function BanksList() {
         <Column
           header="Acciones"
           body={actionBodyTemplate}
-          frozen
+          exportable={false}
+          frozen={true}
           alignFrozen="right"
+          style={{ width: "6rem", textAlign: "center" }}
+          headerStyle={{ textAlign: "center" }}
         />
       </DataTable>
 
+      {/* ──────────────────────────────────────────────────────────────────── */}
+      {/* CONTEXT MENU: FLOATING ACTIONS */}
+      {/* ──────────────────────────────────────────────────────────────────── */}
+      <Menu
+        ref={menuRef}
+        id="bank-menu"
+        model={getMenuItems(actionItem)}
+        popup
+      />
+
+      {/* ──────────────────────────────────────────────────────────────────── */}
+      {/* DIALOG: CREATE/EDIT FORM */}
+      {/* ──────────────────────────────────────────────────────────────────── */}
       <Dialog
         visible={bankFormDialog}
-        style={{ width: "500px" }}
-        header={selectedBank ? "Editar Banco" : "Nuevo Banco"}
         modal
+        maximizable
+        style={{ width: "75vw" }}
+        breakpoints={{ "1400px": "75vw", "900px": "85vw", "600px": "95vw" }}
         onHide={hideFormDialog}
-        footer={
-          <div className="flex gap-2 justify-content-end">
-            <Button label="Cancelar" onClick={hideFormDialog} />
-            <Button label="Guardar" form="bank-form" />
+        header={
+          <div className="mb-2 text-center md:text-left">
+            <div className="border-bottom-2 border-primary pb-2">
+              <h2 className="text-2xl font-bold text-900 mb-2 flex align-items-center justify-content-center md:justify-content-start">
+                <i className="pi pi-building mr-3 text-primary text-3xl"></i>
+                {selectedBank ? "Editar Banco" : "Nuevo Banco"}
+              </h2>
+            </div>
           </div>
+        }
+        footer={
+          <FormActionButtons
+            formId="bank-form"
+            isUpdate={!!selectedBank?.id}
+            onCancel={hideFormDialog}
+            isSubmitting={isSubmitting}
+          />
         }
       >
         <BankForm
           bank={selectedBank}
-          onSave={() => {
-            hideFormDialog();
-            mutate();
-          }}
-          onCancel={hideFormDialog}
+          onSave={handleSave}
           formId="bank-form"
+          onSubmittingChange={setIsSubmitting}
+          toast={toast}
         />
       </Dialog>
 
-      <Dialog
-        visible={deleteBankDialog}
-        style={{ width: "450px" }}
-        header="Confirmar"
-        modal
-        footer={
-          <div className="flex gap-2 justify-content-end">
-            <Button label="No" onClick={() => setDeleteBankDialog(false)} />
-            <Button
-              label="Sí, eliminar"
-              severity="danger"
-              loading={isDeleting}
-              onClick={deleteB}
-            />
-          </div>
-        }
-        onHide={() => setDeleteBankDialog(false)}
-      >
-        <div className="flex gap-3 align-items-center">
-          <i className="pi pi-exclamation-triangle text-red-500 text-2xl" />
-          <span>
-            ¿Estás seguro de que deseas eliminar <b>{selectedBank?.name}</b>?
-          </span>
-        </div>
-      </Dialog>
+      {/* ──────────────────────────────────────────────────────────────────── */}
+      {/* DIALOG: DELETE CONFIRMATION */}
+      {/* ──────────────────────────────────────────────────────────────────── */}
+      <DeleteConfirmDialog
+        visible={deleteDialog}
+        onHide={() => {
+          setDeleteDialog(false);
+          setSelectedBank(null);
+        }}
+        onConfirm={deleteB}
+        itemName={selectedBank?.name}
+        isDeleting={isDeleting}
+      />
     </>
   );
 }

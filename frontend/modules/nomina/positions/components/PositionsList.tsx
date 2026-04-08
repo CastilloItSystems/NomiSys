@@ -1,193 +1,79 @@
 "use client";
 
-import { useRef, useState, useEffect } from "react";
-import { useForm, Controller } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
+import { useRef, useState } from "react";
 import { Dialog } from "primereact/dialog";
 import { DataTable } from "primereact/datatable";
 import { Column } from "primereact/column";
-import { Button } from "primereact/button";
-import { Toast } from "primereact/toast";
 import { InputText } from "primereact/inputtext";
-import { InputNumber } from "primereact/inputnumber";
-import { InputSwitch } from "primereact/inputswitch";
+import { Toast } from "primereact/toast";
+import { Menu } from "primereact/menu";
+import type { MenuItem } from "primereact/menuitem";
 import { classNames } from "primereact/utils";
+import CreateButton from "@/shared/components/CreateButton";
+import DeleteConfirmDialog from "@/shared/components/DeleteConfirmDialog";
+import FormActionButtons from "@/shared/components/FormActionButtons";
+import PositionForm from "./PositionForm";
 import { usePositionsData } from "@/modules/nomina/positions/hooks/usePositionsData";
-import {
-  createPosition,
-  updatePosition,
-  deletePosition,
-} from "@/modules/nomina/positions/services/position.service";
-import {
-  createPositionSchema,
-  CreatePositionFormData,
-} from "@/modules/nomina/positions/schemas/position.schema";
+import { deletePosition } from "@/modules/nomina/positions/services/position.service";
 import { Position } from "@/modules/nomina/positions/interfaces/position.interface";
 import { handleFormError } from "@/utils/errorHandlers";
 
-interface PositionFormProps {
-  position?: Position | null;
-  onSave: () => void;
-  onCancel: () => void;
-  formId?: string;
-}
-
-const PositionForm = ({
-  position,
-  onSave,
-  onCancel,
-  formId = "position-form",
-}: PositionFormProps) => {
-  const toast = useRef<Toast>(null);
-  const [isSubmitting, setIsSubmitting] = useState(false);
-
-  const {
-    control,
-    register,
-    handleSubmit,
-    formState: { errors },
-    reset,
-  } = useForm<CreatePositionFormData>({
-    resolver: zodResolver(createPositionSchema),
-    mode: "onBlur",
-  });
-
-  useEffect(() => {
-    if (position) {
-      reset({
-        name: position.name,
-        code: position.code || "",
-        description: position.description || "",
-        level: position.level || undefined,
-        isActive: position.isActive,
-      });
-    } else {
-      reset({
-        name: "",
-        code: "",
-        description: "",
-        level: undefined,
-        isActive: true,
-      });
-    }
-  }, [position, reset]);
-
-  const onSubmit = async (data: CreatePositionFormData) => {
-    try {
-      setIsSubmitting(true);
-      if (position?.id) {
-        await updatePosition(position.id, data);
-        toast.current?.show({
-          severity: "success",
-          summary: "Éxito",
-          detail: "Cargo actualizado",
-          life: 3000,
-        });
-      } else {
-        await createPosition(data);
-        toast.current?.show({
-          severity: "success",
-          summary: "Éxito",
-          detail: "Cargo creado",
-          life: 3000,
-        });
-      }
-      onSave();
-    } catch (error) {
-      handleFormError(error, toast);
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
-
-  return (
-    <>
-      <Toast ref={toast} />
-      <form onSubmit={handleSubmit(onSubmit)} id={formId}>
-        <div className="field">
-          <label htmlFor="name">
-            Nombre <span className="text-red-500">*</span>
-          </label>
-          <InputText
-            id="name"
-            {...register("name")}
-            className={classNames({ "p-invalid": errors.name })}
-            placeholder="Ej: Gerente de Ventas"
-          />
-          {errors.name && (
-            <small className="p-error">{errors.name.message}</small>
-          )}
-        </div>
-
-        <div className="field">
-          <label htmlFor="code">Código</label>
-          <InputText
-            id="code"
-            {...register("code")}
-            className={classNames({ "p-invalid": errors.code })}
-            placeholder="Ej: GER-VENTAS"
-            maxLength={20}
-          />
-        </div>
-
-        <div className="field">
-          <label htmlFor="description">Descripción</label>
-          <InputText
-            id="description"
-            {...register("description")}
-            className={classNames({ "p-invalid": errors.description })}
-            placeholder="Descripción del cargo"
-            maxLength={500}
-          />
-        </div>
-
-        <div className="field">
-          <label htmlFor="level">Nivel Jerárquico</label>
-          <Controller
-            name="level"
-            control={control}
-            render={({ field }) => (
-              <InputNumber
-                id="level"
-                value={field.value}
-                onValueChange={(e) => field.onChange(e.value)}
-                placeholder="Nivel"
-                min={1}
-              />
-            )}
-          />
-        </div>
-
-        <div className="field">
-          <label htmlFor="isActive">Activo</label>
-          <Controller
-            name="isActive"
-            control={control}
-            render={({ field }) => (
-              <InputSwitch
-                id="isActive"
-                checked={field.value}
-                onChange={(e) => field.onChange(e.value)}
-              />
-            )}
-          />
-        </div>
-      </form>
-    </>
-  );
-};
-
 export default function PositionsList() {
+  // ──────────────────────────────────────────────────────────────────
+  // REFS & HOOKS
+  // ──────────────────────────────────────────────────────────────────
   const toast = useRef<Toast>(null);
-  const { positions, loading, mutate } = usePositionsData();
+  const menuRef = useRef<Menu>(null);
+  const [searchQuery, setSearchQuery] = useState("");
+  const { positions, total, loading, mutate } = usePositionsData(
+    searchQuery || undefined,
+  );
 
+  // ──────────────────────────────────────────────────────────────────
+  // STATE
+  // ──────────────────────────────────────────────────────────────────
   const [selectedPosition, setSelectedPosition] = useState<Position | null>(
     null,
   );
+  const [actionItem, setActionItem] = useState<Position | null>(null);
   const [positionFormDialog, setPositionFormDialog] = useState(false);
-  const [deletePositionDialog, setDeletePositionDialog] = useState(false);
+  const [deleteDialog, setDeleteDialog] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
+  // ──────────────────────────────────────────────────────────────────
+  // SEARCH HANDLER
+  // ──────────────────────────────────────────────────────────────────
+  const handleSearch = (query: string) => {
+    setSearchQuery(query);
+  };
+
+  // ──────────────────────────────────────────────────────────────────
+  // MENU ITEMS
+  // ──────────────────────────────────────────────────────────────────
+  const getMenuItems = (pos: Position | null): MenuItem[] => {
+    if (!pos) return [];
+    return [
+      {
+        label: "Editar",
+        icon: "pi pi-pencil",
+        command: () => editPosition(pos),
+      },
+      {
+        separator: true,
+      },
+      {
+        label: "Eliminar",
+        icon: "pi pi-trash",
+        className: "p-menuitem-danger",
+        command: () => confirmDeletePosition(pos),
+      },
+    ];
+  };
+
+  // ──────────────────────────────────────────────────────────────────
+  // HANDLERS
+  // ──────────────────────────────────────────────────────────────────
   const editPosition = (pos: Position) => {
     setSelectedPosition(pos);
     setPositionFormDialog(true);
@@ -195,7 +81,7 @@ export default function PositionsList() {
 
   const confirmDeletePosition = (pos: Position) => {
     setSelectedPosition(pos);
-    setDeletePositionDialog(true);
+    setDeleteDialog(true);
   };
 
   const deletePos = async () => {
@@ -209,7 +95,8 @@ export default function PositionsList() {
         detail: "Cargo eliminado",
         life: 3000,
       });
-      setDeletePositionDialog(false);
+      setDeleteDialog(false);
+      setSelectedPosition(null);
       mutate();
     } catch (error) {
       handleFormError(error, toast);
@@ -223,41 +110,80 @@ export default function PositionsList() {
     setPositionFormDialog(false);
   };
 
+  const handleSave = async () => {
+    toast.current?.show({
+      severity: "success",
+      summary: "Éxito",
+      detail: selectedPosition?.id
+        ? "Cargo actualizado correctamente"
+        : "Cargo creado correctamente",
+      life: 3000,
+    });
+    await mutate();
+    hideFormDialog();
+  };
+
+  const openNew = () => {
+    setSelectedPosition(null);
+    setPositionFormDialog(true);
+  };
+
+  // ──────────────────────────────────────────────────────────────────
+  // ACTION TEMPLATE
+  // ──────────────────────────────────────────────────────────────────
   const actionBodyTemplate = (rowData: Position) => {
     return (
-      <Button
-        icon="pi pi-ellipsis-v"
-        rounded
-        text
-        onClick={() => {
-          setSelectedPosition(rowData);
+      <i
+        className="pi pi-cog cursor-pointer text-primary"
+        onClick={(e: any) => {
+          setActionItem(rowData);
+          menuRef.current?.toggle(e);
         }}
+        style={{ fontSize: "1.2rem" }}
+        title="Opciones"
       />
     );
   };
 
   return (
     <>
+      {/* ──────────────────────────────────────────────────────────────────── */}
+      {/* NOTIFICATIONS & STATE */}
+      {/* ──────────────────────────────────────────────────────────────────── */}
       <Toast ref={toast} />
 
-      <div className="flex align-items-center justify-content-between mb-4">
-        <h3>Cargos</h3>
-        <Button
-          label="Nuevo Cargo"
-          icon="pi pi-plus"
-          onClick={() => {
-            setSelectedPosition(null);
-            setPositionFormDialog(true);
-          }}
-        />
-      </div>
-
+      {/* ──────────────────────────────────────────────────────────────────── */}
+      {/* DATATABLE: LIST VIEW */}
+      {/* ──────────────────────────────────────────────────────────────────── */}
       <DataTable
         value={positions}
         loading={loading}
         paginator
         rows={10}
+        rowsPerPageOptions={[5, 10, 25, 50]}
+        dataKey="id"
         scrollable
+        sortMode="multiple"
+        header={
+          <div className="flex flex-wrap gap-2 align-items-center justify-content-between">
+            <div className="flex align-items-center gap-2">
+              <h4 className="m-0">Cargos</h4>
+              <span className="text-600 text-sm">({total} total)</span>
+            </div>
+            <div className="flex gap-2">
+              <span className="p-input-icon-left">
+                <i className="pi pi-search" />
+                <InputText
+                  type="search"
+                  placeholder="Buscar..."
+                  value={searchQuery}
+                  onChange={(e) => handleSearch(e.target.value)}
+                />
+              </span>
+              <CreateButton label="Nuevo Cargo" onClick={openNew} />
+            </div>
+          </div>
+        }
         emptyMessage="Sin cargos"
       >
         <Column field="name" header="Nombre" sortable />
@@ -278,61 +204,75 @@ export default function PositionsList() {
         <Column
           header="Acciones"
           body={actionBodyTemplate}
-          frozen
+          exportable={false}
+          frozen={true}
           alignFrozen="right"
+          style={{ width: "6rem", textAlign: "center" }}
+          headerStyle={{ textAlign: "center" }}
         />
       </DataTable>
 
+      {/* ──────────────────────────────────────────────────────────────────── */}
+      {/* CONTEXT MENU: FLOATING ACTIONS */}
+      {/* ──────────────────────────────────────────────────────────────────── */}
+      <Menu
+        ref={menuRef}
+        id="position-menu"
+        model={getMenuItems(actionItem)}
+        popup
+      />
+
+      {/* ──────────────────────────────────────────────────────────────────── */}
+      {/* DIALOG: CREATE/EDIT FORM */}
+      {/* ──────────────────────────────────────────────────────────────────── */}
       <Dialog
         visible={positionFormDialog}
-        style={{ width: "500px" }}
-        header={selectedPosition ? "Editar Cargo" : "Nuevo Cargo"}
         modal
+        maximizable
+        style={{ width: "75vw" }}
+        breakpoints={{ "1400px": "75vw", "900px": "85vw", "600px": "95vw" }}
         onHide={hideFormDialog}
-        footer={
-          <div className="flex gap-2 justify-content-end">
-            <Button label="Cancelar" onClick={hideFormDialog} />
-            <Button label="Guardar" form="position-form" />
+        header={
+          <div className="mb-2 text-center md:text-left">
+            <div className="border-bottom-2 border-primary pb-2">
+              <h2 className="text-2xl font-bold text-900 mb-2 flex align-items-center justify-content-center md:justify-content-start">
+                <i className="pi pi-briefcase mr-3 text-primary text-3xl"></i>
+                {selectedPosition ? "Editar Cargo" : "Nuevo Cargo"}
+              </h2>
+            </div>
           </div>
+        }
+        footer={
+          <FormActionButtons
+            formId="position-form"
+            isUpdate={!!selectedPosition?.id}
+            onCancel={hideFormDialog}
+            isSubmitting={isSubmitting}
+          />
         }
       >
         <PositionForm
           position={selectedPosition}
-          onSave={() => {
-            hideFormDialog();
-            mutate();
-          }}
-          onCancel={hideFormDialog}
+          onSave={handleSave}
           formId="position-form"
+          onSubmittingChange={setIsSubmitting}
+          toast={toast}
         />
       </Dialog>
 
-      <Dialog
-        visible={deletePositionDialog}
-        style={{ width: "450px" }}
-        header="Confirmar"
-        modal
-        footer={
-          <div className="flex gap-2 justify-content-end">
-            <Button label="No" onClick={() => setDeletePositionDialog(false)} />
-            <Button
-              label="Sí, eliminar"
-              severity="danger"
-              loading={isDeleting}
-              onClick={deletePos}
-            />
-          </div>
-        }
-        onHide={() => setDeletePositionDialog(false)}
-      >
-        <div className="flex gap-3 align-items-center">
-          <i className="pi pi-exclamation-triangle text-red-500 text-2xl" />
-          <span>
-            ¿Estás seguro de que deseas eliminar <b>{selectedPosition?.name}</b>
-            ?
-          </span>
-        </div>
-      </Dialog>
+      {/* ──────────────────────────────────────────────────────────────────── */}
+      {/* DIALOG: DELETE CONFIRMATION */}
+      {/* ──────────────────────────────────────────────────────────────────── */}
+      <DeleteConfirmDialog
+        visible={deleteDialog}
+        onHide={() => {
+          setDeleteDialog(false);
+          setSelectedPosition(null);
+        }}
+        onConfirm={deletePos}
+        itemName={selectedPosition?.name}
+        isDeleting={isDeleting}
+      />
     </>
   );
 }

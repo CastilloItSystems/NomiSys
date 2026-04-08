@@ -53,6 +53,11 @@ const AppMenuEmpresa = () => {
               icon: "pi pi-fw pi-briefcase",
               to: "/empresa/nomina/cargos",
             },
+            {
+              label: "Bancos",
+              icon: "pi pi-fw pi-building",
+              to: "/empresa/nomina/bancos",
+            },
           ],
         },
         {
@@ -182,37 +187,6 @@ const AppMenuEmpresa = () => {
           label: "Usuarios y Permisos",
           icon: "pi pi-fw pi-users",
           to: "/empresa/configuracion/usuarios",
-        },
-        {
-          label: "Catálogo",
-          icon: "pi pi-fw pi-tags",
-          items: [
-            {
-              label: "Categorías",
-              icon: "pi pi-fw pi-tags",
-              to: "/empresa/inventario/categorias",
-            },
-            {
-              label: "Marcas",
-              icon: "pi pi-fw pi-flag",
-              to: "/empresa/inventario/marcas",
-            },
-            {
-              label: "Modelos",
-              icon: "pi pi-fw pi-book",
-              to: "/empresa/inventario/modelos",
-            },
-            {
-              label: "Compatibilidad",
-              icon: "pi pi-fw pi-th-large",
-              to: "/empresa/inventario/compatibilidad",
-            },
-            {
-              label: "Unidades de Medida",
-              icon: "pi pi-fw pi-box",
-              to: "/empresa/inventario/unidades",
-            },
-          ],
         },
       ],
     },

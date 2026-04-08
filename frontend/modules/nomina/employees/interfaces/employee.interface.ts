@@ -156,9 +156,16 @@ export interface UpdateEmployeeRequest extends Partial<CreateEmployeeRequest> {
   id: string;
 }
 
-export interface EmployeesListResponse {
+export interface PaginationInfo {
   total: number;
-  employees: Employee[];
+  page: number;
+  limit: number;
+  pages: number;
+}
+
+export interface EmployeesListResponse {
+  data: Employee[];
+  pagination: PaginationInfo;
 }
 
 export interface EmployeeDetailsResponse {

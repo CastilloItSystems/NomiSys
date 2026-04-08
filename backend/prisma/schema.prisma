@@ -212,7 +212,7 @@ model Employee {
   positionId      String   // FK → Position
   costCenter      String?  @db.VarChar(50)
   contractType    String   @db.VarChar(50)  // Indefinido, Determinado, Obra, Pasantía
-  workSchedule    String   @db.VarChar(50)  // Completa, Parcial, Mixta, Nocturna
+  workSchedule    String?   @db.VarChar(50)  // Completa, Parcial, Mixta, Nocturna
   currentSalary   Decimal  @db.Decimal(15,2)
   salaryType      String   @db.VarChar(10)  // VES, USD
   paymentFrequency String  @db.VarChar(20)  // Quincenal, Mensual, Semanal

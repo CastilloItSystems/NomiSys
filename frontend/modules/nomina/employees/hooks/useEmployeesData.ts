@@ -27,13 +27,12 @@ export const useEmployeesData = (
 ) => {
   const { data, error, isLoading, mutate } = useSWR<EmployeesListResponse>(
     ["employees-list", page, limit, search, departmentId, positionId, status],
-    ([, p, l, s, d, pos, st]) => getEmployees(p, l, s, d, pos, st),
+    () => getEmployees(page, limit, search, departmentId, positionId, status),
     { revalidateOnFocus: false },
   );
-
   return {
-    employees: data?.employees ?? [],
-    total: data?.total ?? 0,
+    employees: data?.data ?? [],
+    total: data?.pagination?.total ?? 0,
     loading: isLoading,
     error,
     mutate: useCallback(() => mutate(), [mutate]),
@@ -45,8 +44,8 @@ export const useEmployeesData = (
  */
 export const useEmployee = (id?: string) => {
   const { data, error, isLoading, mutate } = useSWR<EmployeeDetailsResponse>(
-    id ? `employee-${id}` : null,
-    () => (id ? getEmployee(id) : Promise.resolve(null)),
+    id ? ["employee-detail", id] : null,
+    ([, empId]) => getEmployee(empId as string),
     { revalidateOnFocus: false },
   );
 

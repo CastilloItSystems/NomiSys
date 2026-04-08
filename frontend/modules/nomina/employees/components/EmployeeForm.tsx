@@ -18,7 +18,10 @@ import {
   createEmployee,
   updateEmployee,
 } from "@/modules/nomina/employees/services/employee.service";
-import { Employee } from "@/modules/nomina/employees/interfaces/employee.interface";
+import {
+  Employee,
+  UpdateEmployeeRequest,
+} from "@/modules/nomina/employees/interfaces/employee.interface";
 import { handleFormError } from "@/utils/errorHandlers";
 
 import PersonalDataSection from "./EmployeeFormSections/PersonalDataSection";
@@ -30,17 +33,28 @@ import AdditionalDataSection from "./EmployeeFormSections/AdditionalDataSection"
 interface EmployeeFormProps {
   employee?: Employee | null;
   isNew?: boolean;
+  // Modal mode props (when used inside a Dialog)
+  onSave?: () => void | Promise<void>;
+  formId?: string;
+  onSubmittingChange?: (isSubmitting: boolean) => void;
+  toast?: React.RefObject<Toast>;
 }
 
 export default function EmployeeForm({
   employee,
   isNew = true,
+  onSave,
+  formId,
+  onSubmittingChange,
+  toast: externalToast,
 }: EmployeeFormProps) {
-  const toast = useRef<Toast>(null);
+  const internalToast = useRef<Toast>(null);
+  const toast = externalToast || internalToast;
   const router = useRouter();
+  const isModalMode = !!onSave; // Modal mode if onSave is provided
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [activeTab, setActiveTab] = useState(0);
-  const [showDialog, setShowDialog] = useState(true);
+  const [showDialog, setShowDialog] = useState(!isModalMode); // Only show dialog in standalone mode
 
   const form = useForm<CreateEmployeeFormData>({
     resolver: zodResolver(createEmployeeSchema),
@@ -106,37 +120,41 @@ export default function EmployeeForm({
   const onSubmit = async (data: CreateEmployeeFormData) => {
     try {
       setIsSubmitting(true);
+      if (onSubmittingChange) onSubmittingChange(true);
 
       if (employee?.id) {
-        await updateEmployee(employee.id, { ...data, id: employee.id } as any);
-        toast.current?.show({
-          severity: "success",
-          summary: "Éxito",
-          detail: "Empleado actualizado correctamente",
-          life: 3000,
-        });
+        await updateEmployee(employee.id, {
+          ...data,
+          id: employee.id,
+        } as unknown as UpdateEmployeeRequest);
       } else {
         await createEmployee(data);
-        toast.current?.show({
-          severity: "success",
-          summary: "Éxito",
-          detail: "Empleado creado correctamente",
-          life: 3000,
-        });
       }
 
-      setTimeout(() => {
-        router.push("/empresa/nomina/empleados");
-      }, 2000);
+      // If in modal mode, call onSave callback; otherwise redirect
+      if (isModalMode && onSave) {
+        await onSave();
+      } else {
+        setTimeout(() => {
+          router.push("/empresa/nomina/empleados");
+        }, 2000);
+      }
     } catch (error) {
       handleFormError(error, toast);
     } finally {
       setIsSubmitting(false);
+      if (onSubmittingChange) onSubmittingChange(false);
     }
   };
 
   const handleClose = () => {
-    router.push("/empresa/nomina/empleados");
+    if (isModalMode) {
+      // In modal mode, just close (parent dialog will close)
+      // This shouldn't happen but provide fallback
+      return;
+    } else {
+      router.push("/empresa/nomina/empleados");
+    }
   };
 
   const tabsHeader = [
@@ -150,125 +168,138 @@ export default function EmployeeForm({
   const currentTab = tabsHeader[activeTab];
   const hasErrors = Object.keys(errors).length > 0;
 
+  // Form content (shared between modal and standalone modes)
+  const formContent = (
+    <form
+      id={formId}
+      onSubmit={(e) => {
+        e.preventDefault();
+        handleSubmit(onSubmit)();
+      }}
+    >
+      <TabView
+        activeIndex={activeTab}
+        onTabChange={(e) => setActiveTab(e.index)}
+      >
+        {/* Tab 1: Personal Data */}
+        <TabPanel header="Datos Personales" leftIcon="pi pi-user">
+          <div className="p-3">
+            <PersonalDataSection form={form} />
+          </div>
+        </TabPanel>
+
+        {/* Tab 2: Laboral Data */}
+        <TabPanel header="Datos Laborales" leftIcon="pi pi-briefcase">
+          <div className="p-3">
+            <LaboralDataSection form={form} />
+          </div>
+        </TabPanel>
+
+        {/* Tab 3: Social Security */}
+        <TabPanel header="Seguridad Social" leftIcon="pi pi-shield">
+          <div className="p-3">
+            <SocialSecuritySection form={form} />
+          </div>
+        </TabPanel>
+
+        {/* Tab 4: Banking */}
+        <TabPanel header="Datos Bancarios" leftIcon="pi pi-money-bill">
+          <div className="p-3">
+            <BankingDataSection form={form} />
+          </div>
+        </TabPanel>
+
+        {/* Tab 5: Additional */}
+        <TabPanel header="Información Adicional" leftIcon="pi pi-info-circle">
+          <div className="p-3">
+            <AdditionalDataSection form={form} />
+          </div>
+        </TabPanel>
+      </TabView>
+
+      {hasErrors && (
+        <div className="mt-4 p-4 surface-section border-1 border-red-200 border-round bg-red-50">
+          <h4 className="text-red-700 m-0 mb-2">
+            ⚠️ Errores de validación encontrados
+          </h4>
+          <p className="text-sm text-red-600 m-0">
+            Por favor revisa los campos requeridos antes de guardar.
+          </p>
+        </div>
+      )}
+    </form>
+  );
+
+  const tabNavigationButtons = (
+    <div className="flex gap-2">
+      <Button
+        label="Anterior"
+        icon="pi pi-chevron-left"
+        onClick={() => setActiveTab(Math.max(0, activeTab - 1))}
+        disabled={activeTab === 0}
+      />
+      <Button
+        label="Siguiente"
+        icon="pi-chevron-right"
+        iconPos="right"
+        onClick={() => setActiveTab(Math.min(4, activeTab + 1))}
+        disabled={activeTab === 4}
+        className="ml-2"
+      />
+    </div>
+  );
+
+  const actionButtons = (
+    <div className="flex gap-2">
+      <Button label="Cancelar" severity="secondary" onClick={handleClose} />
+      <Button
+        label={isNew ? "Crear" : "Actualizar"}
+        loading={isSubmitting}
+        onClick={() => handleSubmit(onSubmit)()}
+        className="ml-2"
+      />
+    </div>
+  );
+
   return (
     <>
-      <Toast ref={toast} />
+      {!isModalMode && <Toast ref={internalToast} />}
 
-      <Dialog
-        visible={showDialog}
-        onHide={handleClose}
-        header={
-          <div className="flex align-items-center gap-2">
-            <i className={classNames("pi", `pi-${currentTab.icon}`)} />
-            <span>
-              {isNew ? "Crear Nuevo Empleado" : "Editar Empleado"} —{" "}
-              {currentTab.title}
-            </span>
-          </div>
-        }
-        modal
-        maximizable
-        style={{ width: "90vw", height: "90vh" }}
-        onMaximize={(e) => {
-          e.maximized
-            ? (document.documentElement.style.overflow = "hidden")
-            : (document.documentElement.style.overflow = "auto");
-        }}
-        footer={
-          <div className="flex gap-2 justify-content-between">
-            <div>
-              <Button
-                label="Anterior"
-                icon="pi pi-chevron-left"
-                onClick={() => setActiveTab(Math.max(0, activeTab - 1))}
-                disabled={activeTab === 0}
-              />
-              <Button
-                label="Siguiente"
-                icon="pi-chevron-right"
-                iconPos="right"
-                onClick={() => setActiveTab(Math.min(4, activeTab + 1))}
-                disabled={activeTab === 4}
-                className="ml-2"
-              />
+      {isModalMode ? (
+        // Modal mode: render form only (Dialog managed by parent)
+        formContent
+      ) : (
+        // Standalone mode: render with Dialog
+        <Dialog
+          visible={showDialog}
+          onHide={handleClose}
+          header={
+            <div className="flex align-items-center gap-2">
+              <i className={classNames("pi", `pi-${currentTab.icon}`)} />
+              <span>
+                {isNew ? "Crear Nuevo Empleado" : "Editar Empleado"} —{" "}
+                {currentTab.title}
+              </span>
             </div>
-            <div>
-              <Button
-                label="Cancelar"
-                severity="secondary"
-                onClick={handleClose}
-              />
-              <Button
-                label={isNew ? "Crear" : "Actualizar"}
-                loading={isSubmitting}
-                onClick={() => handleSubmit(onSubmit)()}
-                className="ml-2"
-              />
-            </div>
-          </div>
-        }
-      >
-        <form
-          onSubmit={(e) => {
-            e.preventDefault();
-            handleSubmit(onSubmit)();
+          }
+          modal
+          maximizable
+          style={{ width: "90vw", height: "90vh" }}
+          onMaximize={(e) => {
+            e.maximized
+              ? (document.documentElement.style.overflow = "hidden")
+              : (document.documentElement.style.overflow = "auto");
           }}
+          footer={
+            <div className="flex gap-2 justify-content-between">
+              <div>{tabNavigationButtons}</div>
+              <div>{actionButtons}</div>
+            </div>
+          }
         >
-          <TabView
-            activeIndex={activeTab}
-            onTabChange={(e) => setActiveTab(e.index)}
-          >
-            {/* Tab 1: Personal Data */}
-            <TabPanel header="Datos Personales" leftIcon="pi pi-user">
-              <div className="p-3">
-                <PersonalDataSection form={form} />
-              </div>
-            </TabPanel>
-
-            {/* Tab 2: Laboral Data */}
-            <TabPanel header="Datos Laborales" leftIcon="pi pi-briefcase">
-              <div className="p-3">
-                <LaboralDataSection form={form} />
-              </div>
-            </TabPanel>
-
-            {/* Tab 3: Social Security */}
-            <TabPanel header="Seguridad Social" leftIcon="pi pi-shield">
-              <div className="p-3">
-                <SocialSecuritySection form={form} />
-              </div>
-            </TabPanel>
-
-            {/* Tab 4: Banking */}
-            <TabPanel header="Datos Bancarios" leftIcon="pi pi-money-bill">
-              <div className="p-3">
-                <BankingDataSection form={form} />
-              </div>
-            </TabPanel>
-
-            {/* Tab 5: Additional */}
-            <TabPanel
-              header="Información Adicional"
-              leftIcon="pi pi-info-circle"
-            >
-              <div className="p-3">
-                <AdditionalDataSection form={form} />
-              </div>
-            </TabPanel>
-          </TabView>
-        </form>
-
-        {hasErrors && (
-          <div className="mt-4 p-4 surface-section border-1 border-red-200 border-round bg-red-50">
-            <h4 className="text-red-700 m-0 mb-2">
-              ⚠️ Errores de validación encontrados
-            </h4>
-            <p className="text-sm text-red-600 m-0">
-              Por favor revisa los campos requeridos antes de guardar.
-            </p>
-          </div>
-        )}
-      </Dialog>
+          {formContent}
+        </Dialog>
+      )}
     </>
   );
 }

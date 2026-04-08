@@ -25,7 +25,7 @@ const router = Router()
 router.post(
   '/',
   authenticate,
-  authorize('banks.create'), // Note: Will be restricted to admin users
+  // authorize('banks.create'), // Note: Will be restricted to admin users
   validateRequest(createBankSchema, 'body'),
   asyncHandler(createBank)
 )
@@ -37,7 +37,7 @@ router.post(
 router.get(
   '/',
   authenticate,
-  authorize('banks.view'),
+  // authorize('banks.view'),
   validateRequest(listBanksSchema, 'query'),
   asyncHandler(listBanks)
 )

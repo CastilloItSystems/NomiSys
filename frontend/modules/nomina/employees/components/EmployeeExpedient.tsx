@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useRef, useState, useMemo } from "react";
 import { TabView, TabPanel } from "primereact/tabview";
 import { Card } from "primereact/card";
 import { Skeleton } from "primereact/skeleton";
@@ -11,6 +11,8 @@ import { useRouter } from "next/navigation";
 import { classNames } from "primereact/utils";
 
 import { useEmployee } from "@/modules/nomina/employees/hooks/useEmployeesData";
+import { usePositionsData } from "@/modules/nomina/positions/hooks/usePositionsData";
+import { useDepartmentsData } from "@/modules/nomina/departments/hooks/useDepartmentsData";
 import { formatDateFH } from "@/utils/dateUtils";
 
 interface EmployeeExpedientProps {
@@ -30,6 +32,23 @@ export default function EmployeeExpedient({
     loading: isLoading,
     error,
   } = useEmployee(employeeId);
+  const { positions } = usePositionsData();
+  const { departments } = useDepartmentsData();
+
+  const positionName = useMemo(
+    () =>
+      positions.find((p) => p.id === jobInfo?.positionId)?.name ??
+      jobInfo?.positionId ??
+      "-",
+    [positions, jobInfo?.positionId],
+  );
+  const departmentName = useMemo(
+    () =>
+      departments.find((d) => d.id === jobInfo?.departmentId)?.name ??
+      jobInfo?.departmentId ??
+      "-",
+    [departments, jobInfo?.departmentId],
+  );
   const [showDialog, setShowDialog] = useState(true);
   const [activeTab, setActiveTab] = useState(0);
 
@@ -40,7 +59,18 @@ export default function EmployeeExpedient({
   };
 
   const handleEdit = () => {
-    router.push(`/empresa/nomina/empleados/${employeeId}/editar`);
+    // Close expedient first if in modal mode
+    if (onClose) {
+      setShowDialog(false);
+      setTimeout(() => onClose(), 300);
+      // Then navigate to edit page
+      setTimeout(() => {
+        router.push(`/empresa/nomina/empleados/${employeeId}/editar`);
+      }, 300);
+    } else {
+      // Standalone mode - just navigate
+      router.push(`/empresa/nomina/empleados/${employeeId}/editar`);
+    }
   };
 
   if (error) {
@@ -177,11 +207,11 @@ export default function EmployeeExpedient({
                       <div className="grid gap-3">
                         <div className="col-12">
                           <label className="font-bold">Posición</label>
-                          <p>{jobInfo?.positionId || "-"}</p>
+                          <p>{positionName}</p>
                         </div>
                         <div className="col-12 md:col-6">
                           <label className="font-bold">Departamento</label>
-                          <p>{jobInfo?.departmentId || "-"}</p>
+                          <p>{departmentName}</p>
                         </div>
                         <div className="col-12 md:col-6">
                           <label className="font-bold">Fecha de Inicio</label>
@@ -299,11 +329,11 @@ export default function EmployeeExpedient({
                   </div>
                   <div className="col-12 md:col-6">
                     <label className="font-bold block mb-2">Posición</label>
-                    <p>{jobInfo.positionId}</p>
+                    <p>{positionName}</p>
                   </div>
                   <div className="col-12 md:col-6">
                     <label className="font-bold block mb-2">Departamento</label>
-                    <p>{jobInfo.departmentId}</p>
+                    <p>{departmentName}</p>
                   </div>
                   <div className="col-12 md:col-6">
                     <label className="font-bold block mb-2">
