@@ -1,0 +1,17 @@
+model Position {
+  id            String   @id @default(cuid())
+  companyId     String   // FK to Company (no direct relation, text only for multi-tenancy)
+  name          String   @db.VarChar(100)
+  code          String?  @db.VarChar(50)
+  description   String?  @db.Text
+  level         String?  @db.VarChar(50) // e.g., "Senior", "Junior", "Mid-level"
+  isActive      Boolean  @default(true)
+
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@unique([name, companyId]) // Name unique per company
+  @@index([companyId])        // Fast lookup by company
+  @@index([isActive])         // Fast filter by active status
+  @@map("positions")
+}

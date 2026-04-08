@@ -1,0 +1,68 @@
+model Employee {
+  id              String   @id @default(cuid())
+  companyId       String   // FK to Company
+  
+  // Datos personales
+  firstName       String   @db.VarChar(100)
+  secondName      String?  @db.VarChar(100)
+  lastName        String   @db.VarChar(100)
+  secondLastName  String?  @db.VarChar(100)
+  documentType    String   @db.VarChar(1)   // V, E, P
+  documentNumber  String   @db.VarChar(20)
+  birthDate       DateTime
+  gender          String   @db.VarChar(10)  // M, F
+  maritalStatus   String?  @db.VarChar(20)  // Soltero, Casado, etc.
+  nationality     String?  @db.VarChar(50)
+  phone           String   @db.VarChar(20)
+  email           String?  @db.VarChar(100)
+  address         String   @db.Text
+  birthPlace      String?  @db.VarChar(100)
+  
+  // Datos laborales
+  employeeCode    String   @db.VarChar(50)
+  hireDate        DateTime
+  departmentId    String   // FK → Department
+  positionId      String   // FK → Position
+  costCenter      String?  @db.VarChar(50)
+  contractType    String   @db.VarChar(50)  // Indefinido, Determinado, Obra, Pasantía
+  workSchedule    String   @db.VarChar(50)  // Completa, Parcial, Mixta, Nocturna
+  currentSalary   Decimal  @db.Decimal(15,2)
+  salaryType      String   @db.VarChar(10)  // VES, USD
+  paymentFrequency String  @db.VarChar(20)  // Quincenal, Mensual, Semanal
+  supervisorId    String?  // FK → Employee (auto-referencia, nullable)
+  
+  // Datos de seguridad social y fiscal (Venezuela)
+  ivssNumber      String?  @db.VarChar(50)
+  rifNumber       String?  @db.VarChar(50)
+  faovRegistered  Boolean  @default(false)
+  incesRegistered Boolean  @default(false)
+  familyCharges   Int      @default(0)
+  
+  // Datos bancarios
+  bankId          String   // FK → Bank
+  accountType     String   @db.VarChar(20)  // Ahorro, Corriente
+  accountNumber   String   @db.VarChar(20)
+  
+  // Datos adicionales
+  observations    String?  @db.Text
+  emergencyContact String?  @db.VarChar(100)
+  emergencyPhone  String?  @db.VarChar(20)
+  
+  // Control
+  status          String   @default("Activo") @db.VarChar(50)  // Activo, Inactivo, Suspendido, Egresado, En proceso
+  isActive        Boolean  @default(true)
+  
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@unique([companyId, documentType, documentNumber]) // Cédula única por empresa
+  @@unique([companyId, employeeCode]) // Código único por empresa
+  @@index([companyId])
+  @@index([departmentId])
+  @@index([positionId])
+  @@index([bankId])
+  @@index([supervisorId])
+  @@index([status])
+  @@index([isActive])
+  @@map("employees")
+}

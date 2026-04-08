@@ -1,0 +1,18 @@
+model EmployeeJobInfo {
+  id              String   @id @default(cuid())
+  employeeId      String   // FK → Employee
+  
+  departmentId    String   // FK → Department
+  positionId      String   // FK → Position
+  
+  effectiveDate   DateTime
+  endDate         DateTime?  // NULL if current
+  reason          String?  @db.Text
+  
+  createdAt       DateTime @default(now())
+  createdBy       String?
+
+  @@index([employeeId])
+  @@index([effectiveDate])
+  @@map("employee_job_info")
+}

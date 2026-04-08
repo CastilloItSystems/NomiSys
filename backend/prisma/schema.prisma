@@ -152,6 +152,185 @@ model MembershipPermission {
 }
 
 
+model Bank {
+  id        String   @id @default(cuid())
+  name      String   @unique @db.VarChar(100) // Bank name, globally unique
+  code      String   @unique @db.VarChar(10)  // SUDEBAN code (e.g., "0102", "0104")
+  isActive  Boolean  @default(true)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([isActive]) // Fast filter by active status
+  @@index([code])     // Fast lookup by code
+  @@map("banks")
+}
+
+
+model Department {
+  id            String   @id @default(cuid())
+  companyId     String   // FK to Company (no direct relation, text only for multi-tenancy)
+  name          String   @db.VarChar(100)
+  code          String?  @db.VarChar(50)
+  description   String?  @db.Text
+  isActive      Boolean  @default(true)
+
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@unique([name, companyId]) // Name unique per company
+  @@index([companyId])        // Fast lookup by company
+  @@index([isActive])         // Fast filter by active status
+  @@map("departments")
+}
+
+
+model Employee {
+  id              String   @id @default(cuid())
+  companyId       String   // FK to Company
+  
+  // Datos personales
+  firstName       String   @db.VarChar(100)
+  secondName      String?  @db.VarChar(100)
+  lastName        String   @db.VarChar(100)
+  secondLastName  String?  @db.VarChar(100)
+  documentType    String   @db.VarChar(1)   // V, E, P
+  documentNumber  String   @db.VarChar(20)
+  birthDate       DateTime
+  gender          String   @db.VarChar(10)  // M, F
+  maritalStatus   String?  @db.VarChar(20)  // Soltero, Casado, etc.
+  nationality     String?  @db.VarChar(50)
+  phone           String   @db.VarChar(20)
+  email           String?  @db.VarChar(100)
+  address         String   @db.Text
+  birthPlace      String?  @db.VarChar(100)
+  
+  // Datos laborales
+  employeeCode    String   @db.VarChar(50)
+  hireDate        DateTime
+  departmentId    String   // FK → Department
+  positionId      String   // FK → Position
+  costCenter      String?  @db.VarChar(50)
+  contractType    String   @db.VarChar(50)  // Indefinido, Determinado, Obra, Pasantía
+  workSchedule    String   @db.VarChar(50)  // Completa, Parcial, Mixta, Nocturna
+  currentSalary   Decimal  @db.Decimal(15,2)
+  salaryType      String   @db.VarChar(10)  // VES, USD
+  paymentFrequency String  @db.VarChar(20)  // Quincenal, Mensual, Semanal
+  supervisorId    String?  // FK → Employee (auto-referencia, nullable)
+  
+  // Datos de seguridad social y fiscal (Venezuela)
+  ivssNumber      String?  @db.VarChar(50)
+  rifNumber       String?  @db.VarChar(50)
+  faovRegistered  Boolean  @default(false)
+  incesRegistered Boolean  @default(false)
+  familyCharges   Int      @default(0)
+  
+  // Datos bancarios
+  bankId          String   // FK → Bank
+  accountType     String   @db.VarChar(20)  // Ahorro, Corriente
+  accountNumber   String   @db.VarChar(20)
+  
+  // Datos adicionales
+  observations    String?  @db.Text
+  emergencyContact String?  @db.VarChar(100)
+  emergencyPhone  String?  @db.VarChar(20)
+  
+  // Control
+  status          String   @default("Activo") @db.VarChar(50)  // Activo, Inactivo, Suspendido, Egresado, En proceso
+  isActive        Boolean  @default(true)
+  
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@unique([companyId, documentType, documentNumber]) // Cédula única por empresa
+  @@unique([companyId, employeeCode]) // Código único por empresa
+  @@index([companyId])
+  @@index([departmentId])
+  @@index([positionId])
+  @@index([bankId])
+  @@index([supervisorId])
+  @@index([status])
+  @@index([isActive])
+  @@map("employees")
+}
+
+
+model EmployeeJobInfo {
+  id              String   @id @default(cuid())
+  employeeId      String   // FK → Employee
+  
+  departmentId    String   // FK → Department
+  positionId      String   // FK → Position
+  
+  effectiveDate   DateTime
+  endDate         DateTime?  // NULL if current
+  reason          String?  @db.Text
+  
+  createdAt       DateTime @default(now())
+  createdBy       String?
+
+  @@index([employeeId])
+  @@index([effectiveDate])
+  @@map("employee_job_info")
+}
+
+
+model EmployeeSalaryHistory {
+  id              String   @id @default(cuid())
+  employeeId      String   // FK → Employee
+  
+  salary          Decimal  @db.Decimal(15,2)
+  salaryType      String   @db.VarChar(10)   // VES, USD
+  effectiveDate   DateTime
+  previousSalary  Decimal? @db.Decimal(15,2)
+  reason          String?  @db.Text
+  
+  createdAt       DateTime @default(now())
+  createdBy       String?  // userId
+
+  @@index([employeeId])
+  @@index([effectiveDate])
+  @@map("employee_salary_history")
+}
+
+
+model EmployeeStatusHistory {
+  id              String   @id @default(cuid())
+  employeeId      String   // FK → Employee
+  
+  status          String   @db.VarChar(50)
+  effectiveDate   DateTime
+  reason          String?  @db.Text
+  comments        String?  @db.Text
+  
+  createdAt       DateTime @default(now())
+  createdBy       String?
+
+  @@index([employeeId])
+  @@index([status])
+  @@map("employee_status_history")
+}
+
+
+model Position {
+  id            String   @id @default(cuid())
+  companyId     String   // FK to Company (no direct relation, text only for multi-tenancy)
+  name          String   @db.VarChar(100)
+  code          String?  @db.VarChar(50)
+  description   String?  @db.Text
+  level         String?  @db.VarChar(50) // e.g., "Senior", "Junior", "Mid-level"
+  isActive      Boolean  @default(true)
+
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@unique([name, companyId]) // Name unique per company
+  @@index([companyId])        // Fast lookup by company
+  @@index([isActive])         // Fast filter by active status
+  @@map("positions")
+}
+
+
 model Permission {
   id                    String                  @id @default(cuid())
   code                  String                  @unique

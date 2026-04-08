@@ -1,0 +1,17 @@
+model EmployeeSalaryHistory {
+  id              String   @id @default(cuid())
+  employeeId      String   // FK → Employee
+  
+  salary          Decimal  @db.Decimal(15,2)
+  salaryType      String   @db.VarChar(10)   // VES, USD
+  effectiveDate   DateTime
+  previousSalary  Decimal? @db.Decimal(15,2)
+  reason          String?  @db.Text
+  
+  createdAt       DateTime @default(now())
+  createdBy       String?  // userId
+
+  @@index([employeeId])
+  @@index([effectiveDate])
+  @@map("employee_salary_history")
+}

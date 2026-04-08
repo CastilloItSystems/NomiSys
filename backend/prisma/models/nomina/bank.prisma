@@ -1,0 +1,13 @@
+model Bank {
+  id        String   @id @default(cuid())
+  name      String   @unique @db.VarChar(100) // Bank name, globally unique
+  code      String   @unique @db.VarChar(10)  // SUDEBAN code (e.g., "0102", "0104")
+  isActive  Boolean  @default(true)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([isActive]) // Fast filter by active status
+  @@index([code])     // Fast lookup by code
+  @@map("banks")
+}

@@ -4,6 +4,7 @@ import userRoutes from '../modules/users/users.routes.js'
 import companyRoutes from '../modules/companies/companies.routes.js'
 import companyRoleRoutes from '../modules/company-roles/companyRoles.routes.js'
 import membershipRoutes from '../modules/memberships/memberships.routes.js'
+import nominaRoutes from '../modules/nomina/index.js'
 
 // Middlewares
 import { authenticate } from '../shared/middleware/authenticate.middleware.js'
@@ -25,5 +26,8 @@ router.use('/companies/:id/roles', authenticate, companyRoleRoutes)
 
 // Companies (global SaaS entity — does not require extractCompany)
 router.use('/companies', authenticate, companyRoutes)
+
+// Nómina submódulos (departamentos, posiciones, bancos)
+router.use('/nomina', nominaRoutes)
 
 export default router
