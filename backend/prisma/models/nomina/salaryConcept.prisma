@@ -1,0 +1,38 @@
+model SalaryConcept {
+  id             String   @id @default(cuid())
+  companyId      String
+  name           String   @db.VarChar(100)
+  code           String   @db.VarChar(20)
+  type           String   @db.VarChar(30)  // Ingreso | Deducción | Aporte Patronal
+  description    String?  @db.Text
+  isTaxable      Boolean  @default(true)
+  isActive       Boolean  @default(true)
+
+  // Formula engine
+  // If set, the concept amount is computed by evaluating this expression.
+  // Available variables: salario_basico, salario_diario, dias_trabajados,
+  //   horas_jornada, plus the CODE of any prior concept (e.g. "A + C / dias_trabajados")
+  // and any inputVars declared below (e.g. "horas_viaje").
+  formula        String?  @db.Text
+  executionOrder Int      @default(0)      // lower = evaluated first
+  // Names of per-employee variables RR.HH. must supply before processing
+  // e.g. ["horas_viaje", "horas_bono_nocturno"]
+  inputVars      String[] @default([])
+
+  // Scope: null = universal (all employees), set = only employees with this contractTypeId
+  contractTypeId String?
+  contractType   ContractType? @relation("ContractTypeConcepts", fields: [contractTypeId], references: [id])
+
+  // Inverse relation to EmployeeConcept
+  employeeConcepts EmployeeConcept[]
+
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  @@unique([companyId, code])
+  @@index([companyId])
+  @@index([type])
+  @@index([executionOrder])
+  @@index([contractTypeId])
+  @@map("salary_concepts")
+}

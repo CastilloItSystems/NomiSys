@@ -48,7 +48,7 @@ export default function BankingDataSection({ form }: BankingDataSectionProps) {
           )}
         />
         {errors.bankId && (
-          <small className="p-error">{errors.bankId.message}</small>
+          <small className="p-error">{errors.bankId.message as string}</small>
         )}
       </div>
 
@@ -78,7 +78,7 @@ export default function BankingDataSection({ form }: BankingDataSectionProps) {
           )}
         />
         {errors.accountType && (
-          <small className="p-error">{errors.accountType.message}</small>
+          <small className="p-error">{errors.accountType.message as string}</small>
         )}
       </div>
 
@@ -102,7 +102,7 @@ export default function BankingDataSection({ form }: BankingDataSectionProps) {
           )}
         />
         {errors.accountNumber && (
-          <small className="p-error">{errors.accountNumber.message}</small>
+          <small className="p-error">{errors.accountNumber.message as string}</small>
         )}
         <small className="text-gray-500 block mt-2">
           Debe tener exactamente 20 dígitos (estándar Venezuela)

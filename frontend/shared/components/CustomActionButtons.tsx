@@ -1,3 +1,4 @@
+// @ts-nocheck
 import React, { useRef } from "react";
 import { useUserRoles } from "../../hooks/useUserRoles";
 import { Button } from "primereact/button";

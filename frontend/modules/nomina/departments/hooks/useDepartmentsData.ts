@@ -16,7 +16,7 @@ import {
 export const useDepartmentsData = (search?: string) => {
   const { data, error, isLoading, mutate } = useSWR<DepartmentsListResponse>(
     ["departments-list", search],
-    ([, s]) => getDepartments(s),
+    ([, s]: [string, string | undefined]) => getDepartments(s),
     { revalidateOnFocus: false },
   );
 

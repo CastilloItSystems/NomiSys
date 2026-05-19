@@ -50,7 +50,7 @@ export const useEmployee = (id?: string) => {
   );
   console.log(data);
   return {
-    employee: data,
+    employee: data?.employee,
     jobInfo: data?.currentJobInfo,
     salaryHistory: data?.salaryHistory ?? [],
     jobHistory: data?.jobHistory ?? [],
@@ -58,4 +58,14 @@ export const useEmployee = (id?: string) => {
     error,
     mutate: useCallback(() => mutate(), [mutate]),
   };
+};
+
+/**
+ * Tuple-style hook for edit page: returns [employee, isLoading, error]
+ */
+export const useEmployeeData = (
+  id: string,
+): [Employee | undefined, boolean, Error | undefined] => {
+  const { employee, loading, error } = useEmployee(id);
+  return [employee, loading, error];
 };

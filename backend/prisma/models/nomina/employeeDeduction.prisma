@@ -1,0 +1,21 @@
+model EmployeeDeduction {
+  id          String   @id @default(cuid())
+  companyId   String
+  employeeId  String
+  conceptId   String   // FK → SalaryConcept
+  calcType    String   @db.VarChar(20)  // Porcentaje | Monto Fijo
+  amount      Decimal? @db.Decimal(15,2)
+  percentage  Decimal? @db.Decimal(5,4)
+  description String?  @db.Text
+  startDate   DateTime
+  endDate     DateTime?
+  isActive    Boolean  @default(true)
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([companyId])
+  @@index([employeeId])
+  @@index([conceptId])
+  @@map("employee_deductions")
+}

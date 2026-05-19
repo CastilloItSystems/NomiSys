@@ -169,7 +169,7 @@ const EmpresaForm = ({
   const onSubmit = async (data: EmpresaFormData) => {
     if (onSubmittingChange) onSubmittingChange(true);
     try {
-      let savedEmpresa: Empresa;
+      let savedEmpresa: { id: string } | undefined;
       if (empresa) {
         savedEmpresa = await updateEmpresa(empresa.id, data);
         toast.current?.show({

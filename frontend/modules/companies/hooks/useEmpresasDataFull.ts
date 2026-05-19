@@ -1,6 +1,6 @@
 import { getEmpresas } from "@/modules/companies/services/empresa.service";
 import { Empresa } from "@/modules/companies/interfaces/empresa.interface";
-import { useCallback, useEffect } from "react";
+import { useCallback } from "react";
 import useSWR from "swr";
 
 // Tipo para el estado consolidado
@@ -20,7 +20,7 @@ const fetcher = async () => {
   );
 
   return {
-    empresas: empresasDB?.companies || [],
+    empresas: (empresasDB?.companies as unknown as Empresa[]) || [],
   };
 };
 

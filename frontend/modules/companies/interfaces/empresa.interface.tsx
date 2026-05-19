@@ -1,5 +1,3 @@
-import { Usuario } from "./authInterface";
-
 export interface Empresa {
   id: string;
   name: string;
@@ -32,7 +30,7 @@ export interface Empresa {
   deleted: boolean;
   createdAt: string;
   updatedAt: string;
-  users?: Usuario[];
+  users?: Record<string, unknown>[];
 }
 
 export interface EmpresaCreate {

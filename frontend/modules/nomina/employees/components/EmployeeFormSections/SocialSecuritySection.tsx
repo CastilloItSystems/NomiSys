@@ -31,7 +31,7 @@ export default function SocialSecuritySection({
           className={classNames({ "p-invalid": errors.ivssNumber })}
         />
         {errors.ivssNumber && (
-          <small className="p-error">{errors.ivssNumber.message}</small>
+          <small className="p-error">{errors.ivssNumber.message as string}</small>
         )}
         <small className="text-gray-500 block mt-2">
           Seguro Social Obligatorio (opcional pero recomendado)
@@ -50,7 +50,7 @@ export default function SocialSecuritySection({
           className={classNames({ "p-invalid": errors.rifNumber })}
         />
         {errors.rifNumber && (
-          <small className="p-error">{errors.rifNumber.message}</small>
+          <small className="p-error">{errors.rifNumber.message as string}</small>
         )}
         <small className="text-gray-500 block mt-2">
           Formato: J/V/E/G-XXXXXXXX-X (opcional)

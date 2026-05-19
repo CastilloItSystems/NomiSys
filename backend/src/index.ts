@@ -10,7 +10,7 @@ import {
   seedDefaultRolesForEmpresa,
 } from './services/empresa-setup.service.js'
 
-const port = Number(process.env.PORT) || 4000
+const port = Number(process.env.PORT) || 4001
 
 // Create HTTP server
 const server = createServer(app)

@@ -16,10 +16,8 @@ import { Button } from "primereact/button";
 import { Divider } from "primereact/divider";
 import { ProgressBar } from "primereact/progressbar";
 import { Checkbox } from "primereact/checkbox";
-import {
-  createUser,
-  registerUser,
-} from "@/modules/users/services/user.service";
+import { createUser } from "@/modules/users/services/user.service";
+import { registerUser } from "@/modules/auth/services/auth.service";
 
 // Nuevo esquema de validación para registro
 const registerSchema = z

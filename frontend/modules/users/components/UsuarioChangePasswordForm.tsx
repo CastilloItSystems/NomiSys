@@ -6,25 +6,13 @@ import { z } from "zod";
 import { Password } from "primereact/password";
 import { classNames } from "primereact/utils";
 
-import { updateUser, User } from "@/modules/users/services/user.service";
+import { updateUser } from "@/modules/users/services/user.service";
+import type { User } from "@/modules/users/interfaces/user.interface";
 import { handleFormError } from "@/utils/errorHandlers";
-import {
-  PasswordRequirements,
-  passwordValidator,
-} from "./PasswordRequirements";
+import { PasswordRequirements } from "./PasswordRequirements";
+import { userChangePasswordSchema } from "@/modules/users/schemas/password.schema";
 
-// Validación
-const passwordSchema = z
-  .object({
-    newPassword: passwordValidator,
-    confirmPassword: z.string(),
-  })
-  .refine((data) => data.newPassword === data.confirmPassword, {
-    message: "Las contraseñas no coinciden",
-    path: ["confirmPassword"],
-  });
-
-type FormData = z.infer<typeof passwordSchema>;
+type FormData = z.infer<typeof userChangePasswordSchema>;
 
 interface UsuarioChangePasswordFormProps {
   usuario: User | null;
@@ -50,7 +38,7 @@ const UsuarioChangePasswordForm = ({
     reset,
     watch,
   } = useForm<FormData>({
-    resolver: zodResolver(passwordSchema),
+    resolver: zodResolver(userChangePasswordSchema),
     mode: "onBlur",
     defaultValues: {
       newPassword: "",

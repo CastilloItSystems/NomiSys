@@ -1,0 +1,23 @@
+// Per-employee concept settings: manual amounts, disabled concepts, notes.
+// This allows customizing payroll concepts for specific employees.
+model EmployeeConcept {
+  id           String   @id @default(cuid())
+  companyId    String
+  employeeId   String
+  conceptId    String   // FK → SalaryConcept
+  manualAmount Decimal? @db.Decimal(15,2)  // Override formula result (null = use formula)
+  disabled     Boolean  @default(false)        // Skip this concept for this employee
+  notes        String?  @db.Text
+
+  // Relations
+  concept      SalaryConcept? @relation(fields: [conceptId], references: [id])
+
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  @@unique([companyId, employeeId, conceptId])
+  @@index([companyId])
+  @@index([employeeId])
+  @@index([conceptId])
+  @@map("employee_concepts")
+}

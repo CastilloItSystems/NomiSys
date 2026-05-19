@@ -1,0 +1,19 @@
+// Stores per-employee variable inputs for a payroll run.
+// RR.HH. enters these values (e.g. hours worked, travel hours) before processing.
+// The formula engine reads them to evaluate concepts that declare inputVars.
+model PayrollRunInput {
+  id         String   @id @default(cuid())
+  companyId  String
+  runId      String
+  employeeId String
+  // Arbitrary key-value map: { "horas_viaje": 12, "horas_bono_nocturno": 3.5 }
+  vars       Json     @default("{}")
+
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@unique([runId, employeeId])
+  @@index([companyId])
+  @@index([runId])
+  @@map("payroll_run_inputs")
+}

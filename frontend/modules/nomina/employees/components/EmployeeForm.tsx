@@ -88,6 +88,7 @@ export default function EmployeeForm({
       departmentId: "",
       costCenter: "",
       contractType: "INDEFINITE",
+      contractTypeId: null,
       workShift: "FULL_TIME",
       payFrequency: "MONTHLY",
       supervisorId: "",

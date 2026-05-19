@@ -5,7 +5,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { InputText } from "primereact/inputtext";
 import { classNames } from "primereact/utils";
-import { profileSchema } from "@/modules/auth/schemas/auth.schema";
+import { profileSchema } from "@/modules/users/schemas/user.schema";
 import { Toast } from "primereact/toast";
 import { FileUpload, FileUploadSelectEvent } from "primereact/fileupload";
 import { Image } from "primereact/image";

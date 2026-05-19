@@ -1,4 +1,4 @@
-import { number, object, string } from "zod";
+import { object, string } from "zod";
 
 export const loginSchema = object({
   email: string().email("Invalid email"),
@@ -38,17 +38,4 @@ export const usuarioSchema = object({
   departments: string()
     .array()
     .min(1, "Debes seleccionar al menos un departamento"),
-});
-export const profileSchema = object({
-  name: string().min(1, "El nombre es obligatorio"),
-
-  phone: string()
-    .nonempty("El teléfono es obligatorio")
-    .min(8, "El teléfono debe tener al menos 8 dígitos")
-    .max(20, "El teléfono no puede exceder los 20 dígitos")
-    .regex(/^[\d\+\-\s]+$/, {
-      message: "El teléfono solo puede contener números, guiones y el signo +",
-    }),
-
-  idRefineria: string().array().optional(),
 });

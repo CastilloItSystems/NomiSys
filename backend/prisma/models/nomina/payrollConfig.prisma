@@ -1,0 +1,30 @@
+model PayrollConfig {
+  id              String   @id @default(cuid())
+  companyId       String   @unique
+  salarioMinimo   Decimal  @default(0) @db.Decimal(15,2)
+  salarioMinimoBs Decimal  @default(0) @db.Decimal(15,2)
+  tasaCambio      Decimal  @default(1) @db.Decimal(15,6)
+  ivssRate        Decimal  @default(0.04) @db.Decimal(5,4)
+  faovRate        Decimal  @default(0.01) @db.Decimal(5,4)
+  incesRate       Decimal  @default(0.005) @db.Decimal(5,4)
+  ivssMaxSalarios Int      @default(5)  // Tope: N salarios mínimos
+
+  // Bono de Alimentación (Cesta Ticket) — obligatorio LOTTT
+  bonoAlimentacion   Decimal @default(0) @db.Decimal(15,2) // monto diario en VES
+  bonoAlimentacionAplica Boolean @default(true)
+
+  // Utilidades — días mínimos por ley (LOTTT Art. 131 = 15 días)
+  utilidadesDias  Int     @default(15)
+
+  // ISLR — retención estimada mensual (porcentaje aplicado al exceso)
+  islrAplica      Boolean @default(false)
+  islrUMT         Decimal @default(0) @db.Decimal(15,2) // Unidad Municipal Tributaria
+
+  // Prestaciones Sociales — días garantía por trimestre (LOTTT Art. 142 = 15 días)
+  prestacionesDiasGarantia Int @default(15)
+
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@map("payroll_config")
+}

@@ -13,8 +13,8 @@ import MembershipPermissions from "./MembershipPermissions";
 import {
   deleteMembership,
   getMembershipsByUser,
-  Membership,
 } from "@/modules/users/services/user.service";
+import type { Membership } from "@/modules/users/interfaces/user.interface";
 import CreateButton from "@/shared/components/CreateButton";
 import FormActionButtons from "@/shared/components/FormActionButtons";
 

@@ -1,32 +1,51 @@
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# NomiSys Frontend
 
-## Getting Started
+Next.js 13 App Router frontend for NomiSys.
 
-First, run the development server:
+## Scripts
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+npm run dev    # starts on port 3000
+npm run build
+npm run start
+npm run lint
+npm run test   # stub: prints "No tests configured"
 ```
 
-Open [http://localhost:3001](http://localhost:3001) with your browser to see the result.
+## Local Setup
 
-## Learn More
+```bash
+npm install
+npm run dev
+```
 
-To learn more about Next.js, take a look at the following resources:
+Open `http://localhost:3000`.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Required Environment
 
-ok quiero en la carpeta que dice documento del cliente, analises todo lo que se le ofrece al cliente
+At minimum for local auth flow:
 
-luego en la carpeta que dice docs de la app analises todos los archivos .md que hablan de la app y sus funcones.
+- `AUTH_SECRET`
 
-me digas si lograste leer todos los documentos y luego me des un analisis si la aplicacion cumple con lo que se ofrecio, adicionalmente quiero que realicemos luego una estrategia para una presentacion haciendo enfoque en lo que el sistema puede mejorar a la empresa, hacer enfasis en que no solo estamos vendiendo una app estamos vendiendo una solucion adaptativa en el tiempo que permite cortar la brecha en lo que el sistema actualmente hace vs lo que la empresa quiere que haga, ya que somos especialistas en ofrecer app adaptativos, tambien quiero diferencia mi app vs otras como sap odoo saint infoauto, haciendo enfacis que aunque odoo y sap con adaptativas los cotos de licencia e implementacion asi como los tiempos son insostenibles para las empresas y que saint y infoauto son software que no se pueden adapar a la empresa la empresa se tiene q adaptar a ellos. quiero resaltar tambien la inclusion de agente de ia un landing page de catura de clientes y un modulo a desarrollar de catalgos de vengas de vehiculos.
+Recommended for local API integration:
 
-desarrollame un promt sin dejar nada por fuera, que sea en espa;ol y orientado a gemine
+- `NEXT_PUBLIC_API_BASE_URL` (for example `http://localhost:4000/api`)
+
+Optional for Google sign-in:
+
+- `GOOGLE_CLIENT_ID`
+- `GOOGLE_CLIENT_SECRET`
+- `NEXTAUTH_URL`
+
+## Important Runtime Notes
+
+- `middleware.ts` throws immediately if `AUTH_SECRET` is missing.
+- `app/api/apiClient.ts` defaults to production API when `NEXT_PUBLIC_API_BASE_URL` is unset.
+- `next.config.js` has `typescript.ignoreBuildErrors: true`, so builds can pass even with TypeScript errors.
+
+## App Layout
+
+- Root layout: `app/layout.tsx`
+- Main app routes: `app/(main)`
+- Landing routes: `app/(landing)`
+- NextAuth route handler: `app/api/auth/[...nextauth]/route.ts`

@@ -5,7 +5,11 @@ import EmployeeForm from "@/modules/nomina/employees/components/EmployeeForm";
 import { useEmployeeData } from "@/modules/nomina/employees/hooks/useEmployeesData";
 import { Skeleton } from "primereact/skeleton";
 
-const EditEmployeePage: Page = ({ params }: { params: { id: string } }) => {
+const EditEmployeePage: Page<{ params: { id: string } }> = ({
+  params,
+}: {
+  params: { id: string };
+}) => {
   const [employee, isLoading, error] = useEmployeeData(params.id);
 
   if (isLoading) {

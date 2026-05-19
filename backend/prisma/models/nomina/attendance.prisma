@@ -1,0 +1,21 @@
+model Attendance {
+  id         String   @id @default(cuid())
+  companyId  String
+  employeeId String
+  date       DateTime
+  status     String   @db.VarChar(20)
+  // Presente | Ausente | Tardanza | Permiso | Vacaciones | Feriado
+  checkIn    DateTime?
+  checkOut   DateTime?
+  notes      String?  @db.Text
+  isActive   Boolean  @default(true)
+
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@unique([companyId, employeeId, date])
+  @@index([companyId])
+  @@index([employeeId])
+  @@index([date])
+  @@map("attendance")
+}

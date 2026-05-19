@@ -1,76 +1,5 @@
 import type { PrismaClient } from '../../src/generated/prisma/client.js'
-
-const ROLE_PERMISSIONS: Record<string, string[]> = {
-  OWNER: [
-    'users.view',
-    'users.create',
-    'users.update',
-    'users.delete',
-    'users.approve',
-    'departments.view',
-    'departments.create',
-    'departments.update',
-    'departments.delete',
-    'positions.view',
-    'positions.create',
-    'positions.update',
-    'positions.delete',
-    'banks.view',
-    'employees.view',
-    'employees.create',
-    'employees.update',
-    'employees.delete',
-    'employees.approve',
-    'employees.export',
-    'reports.export',
-  ],
-  ADMIN: [
-    'users.view',
-    'users.create',
-    'users.update',
-    'users.approve',
-    'departments.view',
-    'departments.create',
-    'departments.update',
-    'departments.delete',
-    'positions.view',
-    'positions.create',
-    'positions.update',
-    'positions.delete',
-    'banks.view',
-    'employees.view',
-    'employees.create',
-    'employees.update',
-    'employees.delete',
-    'employees.approve',
-    'employees.export',
-    'reports.export',
-  ],
-  GERENTE: [
-    'users.view',
-    'departments.view',
-    'departments.create',
-    'departments.update',
-    'positions.view',
-    'positions.create',
-    'positions.update',
-    'banks.view',
-    'employees.view',
-    'employees.create',
-    'employees.update',
-    'employees.export',
-    'reports.export',
-  ],
-  ALMACENISTA: ['users.view', 'banks.view', 'employees.view'],
-  VENDEDOR: ['users.view', 'banks.view', 'employees.view'],
-  VIEWER: [
-    'users.view',
-    'departments.view',
-    'positions.view',
-    'banks.view',
-    'employees.view',
-  ],
-}
+import { DEFAULT_ROLE_PERMISSIONS } from '../../src/shared/constants/permissionRegistry.js'
 
 export default async function seedCompanyRoles(
   prisma: PrismaClient,
@@ -78,7 +7,7 @@ export default async function seedCompanyRoles(
 ) {
   try {
     for (const [roleName, permissionCodes] of Object.entries(
-      ROLE_PERMISSIONS
+      DEFAULT_ROLE_PERMISSIONS
     )) {
       const role = await prisma.companyRole.upsert({
         where: {

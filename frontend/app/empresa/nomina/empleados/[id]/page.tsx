@@ -3,7 +3,7 @@
 import { Page } from "@/types";
 import EmployeeExpedient from "@/modules/nomina/employees/components/EmployeeExpedient";
 
-const EmployeeExpedientPage: Page = ({
+const EmployeeExpedientPage: Page<{ params: { id: string } }> = ({
   params,
 }: {
   params: { id: string };

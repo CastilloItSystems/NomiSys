@@ -118,7 +118,7 @@ const AppNotificationDropdown = ({ session }: AppNotificationDropdownProps) => {
                       onClick={async () => {
                         if (!notification.read) {
                           // Llama a tu API para marcar como leída
-                          await marcarNotificacionLeida(notification._id);
+                          await marcarNotificacionLeida(notification._id ?? "");
                           // Opcional: actualiza el estado local para reflejar el cambio sin recargar
                           notification.read = true;
                           // Si usas setState, haz una copia del array y actualiza

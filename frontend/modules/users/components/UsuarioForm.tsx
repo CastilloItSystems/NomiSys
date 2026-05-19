@@ -11,63 +11,19 @@ import { MultiSelect } from "primereact/multiselect";
 import { Checkbox } from "primereact/checkbox";
 import { classNames } from "primereact/utils";
 
-import {
-  createUser,
-  updateUser,
+import { createUser, updateUser } from "@/modules/users/services/user.service";
+import type {
   CreateUserRequest,
   UpdateUserRequest,
   User,
-} from "@/modules/users/services/user.service";
+} from "@/modules/users/interfaces/user.interface";
 import { handleFormError } from "@/utils/errorHandlers";
+import { PasswordRequirements } from "./PasswordRequirements";
 import {
-  PasswordRequirements,
-  passwordValidator,
-  optionalPasswordValidator,
-} from "./PasswordRequirements";
+  createUserSchema,
+  updateUserSchema,
+} from "@/modules/users/schemas/user.schema";
 import PhoneInput from "@/shared/components/PhoneInput";
-
-const baseUsuarioSchema = {
-  name: z.string().min(1, "El nombre es requerido"),
-  email: z.string().email("Correo inválido"),
-  phone: z.string().optional().or(z.literal("")),
-  departments: z
-    .array(z.string())
-    .min(1, "Seleccione al menos un departamento"),
-  access: z.enum(["full", "limited", "none"]),
-  status: z.enum(["active", "pending", "suspended"]),
-  isTechnician: z.boolean().optional(),
-};
-
-const createUserSchema = z
-  .object({
-    ...baseUsuarioSchema,
-    password: passwordValidator,
-    confirmPassword: z.string(),
-  })
-  .refine((data) => data.password === data.confirmPassword, {
-    message: "Las contraseñas no coinciden",
-    path: ["confirmPassword"],
-  });
-
-const updateUserSchema = z
-  .object({
-    ...baseUsuarioSchema,
-    password: optionalPasswordValidator,
-    confirmPassword: z.string().optional(),
-  })
-  .refine(
-    (data) => {
-      // Solo validamos coincidencia si se ingresó algo en la contraseña
-      if (data.password) {
-        return data.password === data.confirmPassword;
-      }
-      return true;
-    },
-    {
-      message: "Las contraseñas no coinciden",
-      path: ["confirmPassword"],
-    },
-  );
 
 type FormData = z.infer<typeof createUserSchema> &
   z.infer<typeof updateUserSchema>;

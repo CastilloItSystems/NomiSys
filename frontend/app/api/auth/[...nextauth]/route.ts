@@ -1,10 +1,6 @@
 import NextAuth, { DefaultSession } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
-import {
-  getUser,
-  googleSingIn,
-  loginUser,
-} from "@/modules/users/services/user.service";
+import { googleSingIn, loginUser } from "@/modules/auth/services/auth.service";
 import { Usuario } from "@/modules/auth/interfaces/auth.interface";
 import GoogleProvider from "next-auth/providers/google";
 declare module "next-auth" {

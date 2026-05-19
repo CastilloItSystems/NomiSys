@@ -10,6 +10,7 @@ import SalaryInput from "@/shared/components/SalaryInput";
 import { usePositionsData } from "@/modules/nomina/positions/hooks/usePositionsData";
 import { useDepartmentsData } from "@/modules/nomina/departments/hooks/useDepartmentsData";
 import { useEmployeesData } from "@/modules/nomina/employees/hooks/useEmployeesData";
+import { useContractTypesData } from "@/modules/nomina/contract-types/hooks/useContractTypesData";
 
 interface LaboralDataSectionProps {
   form: UseFormReturn<any>;
@@ -50,6 +51,11 @@ export default function LaboralDataSection({ form }: LaboralDataSectionProps) {
   const { positions, loading: posLoading } = usePositionsData();
   const { departments, loading: deptLoading } = useDepartmentsData();
   const { employees, loading: empLoading } = useEmployeesData(0, 100);
+  const { contractTypes } = useContractTypesData();
+  const contractTypeIdOptions = [
+    { label: "Sin tipo específico (universal)", value: null },
+    ...contractTypes.map((ct: any) => ({ label: ct.name, value: ct.id })),
+  ];
 
   const currency = watch("currency");
 
@@ -82,7 +88,9 @@ export default function LaboralDataSection({ form }: LaboralDataSectionProps) {
           placeholder="Ej: EMP-001"
         />
         {errors.employeeCode && (
-          <small className="p-error">{errors.employeeCode.message}</small>
+          <small className="p-error">
+            {errors.employeeCode.message as string}
+          </small>
         )}
       </div>
 
@@ -107,7 +115,7 @@ export default function LaboralDataSection({ form }: LaboralDataSectionProps) {
           )}
         />
         {errors.hireDate && (
-          <small className="p-error">{errors.hireDate.message}</small>
+          <small className="p-error">{errors.hireDate.message as string}</small>
         )}
       </div>
 
@@ -138,7 +146,9 @@ export default function LaboralDataSection({ form }: LaboralDataSectionProps) {
           )}
         />
         {errors.departmentId && (
-          <small className="p-error">{errors.departmentId.message}</small>
+          <small className="p-error">
+            {errors.departmentId.message as string}
+          </small>
         )}
       </div>
 
@@ -166,7 +176,9 @@ export default function LaboralDataSection({ form }: LaboralDataSectionProps) {
           )}
         />
         {errors.positionId && (
-          <small className="p-error">{errors.positionId.message}</small>
+          <small className="p-error">
+            {errors.positionId.message as string}
+          </small>
         )}
       </div>
 
@@ -196,8 +208,39 @@ export default function LaboralDataSection({ form }: LaboralDataSectionProps) {
           )}
         />
         {errors.contractType && (
-          <small className="p-error">{errors.contractType.message}</small>
+          <small className="p-error">
+            {errors.contractType.message as string}
+          </small>
         )}
+      </div>
+
+      <div className="field col-12 md:col-6 lg:col-3">
+        <label
+          htmlFor="contractTypeId"
+          className="font-medium text-900 block mb-2"
+        >
+          Régimen CCP / Convención
+        </label>
+        <Controller
+          name="contractTypeId"
+          control={control}
+          render={({ field }) => (
+            <Dropdown
+              id="contractTypeId"
+              value={field.value ?? null}
+              onChange={(e) => field.onChange(e.value ?? null)}
+              options={contractTypeIdOptions}
+              optionLabel="label"
+              optionValue="value"
+              placeholder="Sin régimen específico"
+              className="w-full"
+              showClear
+            />
+          )}
+        />
+        <small className="text-color-secondary">
+          Determina qué conceptos de nómina aplican a este empleado.
+        </small>
       </div>
 
       <div className="field col-12 md:col-6 lg:col-3">
@@ -223,7 +266,9 @@ export default function LaboralDataSection({ form }: LaboralDataSectionProps) {
           )}
         />
         {errors.workShift && (
-          <small className="p-error">{errors.workShift.message}</small>
+          <small className="p-error">
+            {errors.workShift.message as string}
+          </small>
         )}
       </div>
 
@@ -253,7 +298,9 @@ export default function LaboralDataSection({ form }: LaboralDataSectionProps) {
           )}
         />
         {errors.payFrequency && (
-          <small className="p-error">{errors.payFrequency.message}</small>
+          <small className="p-error">
+            {errors.payFrequency.message as string}
+          </small>
         )}
       </div>
 
@@ -288,7 +335,9 @@ export default function LaboralDataSection({ form }: LaboralDataSectionProps) {
           )}
         />
         {errors.salaryAmount && (
-          <small className="p-error">{errors.salaryAmount.message}</small>
+          <small className="p-error">
+            {errors.salaryAmount.message as string}
+          </small>
         )}
       </div>
 
@@ -313,7 +362,7 @@ export default function LaboralDataSection({ form }: LaboralDataSectionProps) {
           )}
         />
         {errors.currency && (
-          <small className="p-error">{errors.currency.message}</small>
+          <small className="p-error">{errors.currency.message as string}</small>
         )}
       </div>
 

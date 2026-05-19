@@ -25,7 +25,7 @@ const options = {
     },
     servers: [
       {
-        url: `${process.env.API_BASE_URL || 'http://localhost:4000'}/api`,
+        url: `${process.env.API_BASE_URL || 'http://localhost:4001'}/api`,
         description:
           process.env.NODE_ENV === 'production'
             ? 'Production Server'

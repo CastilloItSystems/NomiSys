@@ -68,6 +68,7 @@ export interface EmployeeJobInfo {
   departmentId: string;
   costCenter?: string;
   contractType: ContractType;
+  contractTypeId?: string | null;
   workShift: WorkShift;
   payFrequency: PayFrequency;
   supervisorId?: string;
@@ -139,6 +140,7 @@ export interface CreateEmployeeRequest {
   departmentId: string;
   costCenter?: string;
   contractType: ContractType;
+  contractTypeId?: string | null;
   workShift: WorkShift;
   payFrequency: PayFrequency;
   supervisorId?: string;

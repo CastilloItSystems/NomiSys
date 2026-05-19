@@ -24,7 +24,8 @@ model Employee {
   departmentId    String   // FK → Department
   positionId      String   // FK → Position
   costCenter      String?  @db.VarChar(50)
-  contractType    String   @db.VarChar(50)  // Indefinido, Determinado, Obra, Pasantía
+  contractType    String   @db.VarChar(50)  // Indefinido, Determinado, Obra, Pasantía (legacy label)
+  contractTypeId  String?  // FK → ContractType (null = no specific contract type assigned)
   workSchedule    String?   @db.VarChar(50)  // Completa, Parcial, Mixta, Nocturna
   currentSalary   Decimal  @db.Decimal(15,2)
   salaryType      String   @db.VarChar(10)  // VES, USD
@@ -64,5 +65,6 @@ model Employee {
   @@index([supervisorId])
   @@index([status])
   @@index([isActive])
+  @@index([contractTypeId])
   @@map("employees")
 }

@@ -1,0 +1,23 @@
+model PayrollRunLine {
+  id              String   @id @default(cuid())
+  companyId       String
+  runId           String   // FK → PayrollRun
+  employeeId      String
+
+  grossSalary     Decimal  @db.Decimal(15,2)
+  totalDeductions Decimal  @db.Decimal(15,2)
+  netSalary       Decimal  @db.Decimal(15,2)
+
+  // JSON breakdown: { concepts: [{name, type, amount}], ... }
+  details         Json
+
+  isActive        Boolean  @default(true)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@unique([runId, employeeId])
+  @@index([companyId])
+  @@index([runId])
+  @@index([employeeId])
+  @@map("payroll_run_lines")
+}

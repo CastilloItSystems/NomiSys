@@ -1,0 +1,17 @@
+model ContractType {
+  id          String   @id @default(cuid())
+  companyId   String
+  name        String   @db.VarChar(100)
+  description String?  @db.Text
+  isActive    Boolean  @default(true)
+
+  // Inverse relations
+  concepts    SalaryConcept[] @relation("ContractTypeConcepts")
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@unique([companyId, name])
+  @@index([companyId])
+  @@map("contract_types")
+}

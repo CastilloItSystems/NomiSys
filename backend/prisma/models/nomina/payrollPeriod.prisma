@@ -1,0 +1,26 @@
+model PayrollPeriod {
+  id          String   @id @default(cuid())
+  companyId   String   // FK to Company (multi-tenancy)
+
+  name        String   @db.VarChar(150) // Ej: "Quincena 1 - Enero 2026"
+  frequency   String   @db.VarChar(20)  // Semanal, Quincenal, Mensual
+
+  startDate   DateTime
+  endDate     DateTime
+  paymentDate DateTime
+
+  status      String   @default("Borrador") @db.VarChar(20)
+  // Borrador | Abierto | Cerrado | Pagado
+
+  isActive    Boolean  @default(true)
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@unique([companyId, name])    // Nombre único por empresa
+  @@index([companyId])
+  @@index([status])
+  @@index([frequency])
+  @@index([startDate])
+  @@map("payroll_periods")
+}

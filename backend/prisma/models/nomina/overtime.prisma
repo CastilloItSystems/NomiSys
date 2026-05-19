@@ -1,0 +1,22 @@
+model Overtime {
+  id         String   @id @default(cuid())
+  companyId  String
+  employeeId String
+  date       DateTime
+  hours      Decimal  @db.Decimal(5,2)
+  type       String   @db.VarChar(30)
+  // Diurna | Nocturna | Feriada Diurna | Feriada Nocturna
+  reason     String?  @db.Text
+  status     String   @default("Pendiente") @db.VarChar(20)
+  // Pendiente | Aprobado | Rechazado
+  approvedBy String?
+  isActive   Boolean  @default(true)
+
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@index([companyId])
+  @@index([employeeId])
+  @@index([status])
+  @@map("overtime")
+}

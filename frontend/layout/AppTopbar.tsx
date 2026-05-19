@@ -148,7 +148,7 @@ const AppTopbar = forwardRef<AppTopbarRef>((props, ref) => {
               // <li className="topbar-menu-empty ">
 
               <Link href={"/empresa"} className="app-logo">
-                <img alt="app logo" src={activeEmpresa.logoUrl} />
+                <img alt="app logo" src={activeEmpresa.logoUrl ?? undefined} />
                 <span className="app-name">{activeEmpresa.prefixName}</span>
               </Link>
               // </li>

@@ -1,0 +1,35 @@
+// Prestaciones Sociales — Garantía (LOTTT Art. 142)
+// Se acumula trimestralmente: 15 días de salario integral por trimestre
+model SocialBenefit {
+  id          String   @id @default(cuid())
+  companyId   String
+  employeeId  String
+
+  // Período al que corresponde (ej. "Q1-2026", "Q2-2026")
+  period      String   @db.VarChar(20)
+  year        Int
+  quarter     Int      // 1, 2, 3, 4
+
+  // Salario integral del trimestre (salario + alícuota utilidades + alícuota bono vacacional)
+  salarioIntegral Decimal @db.Decimal(15,2)
+  diasGarantia    Int     @default(15)
+  monto           Decimal @db.Decimal(15,2) // salarioIntegral * diasGarantia / 30
+
+  // Acumulado hasta este trimestre
+  montoAcumulado  Decimal @db.Decimal(15,2) @default(0)
+
+  status      String   @default("Activo") @db.VarChar(20)
+  // Activo | Liquidado (al egresar el empleado)
+
+  notes       String?  @db.Text
+
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@unique([companyId, employeeId, year, quarter])
+  @@index([companyId])
+  @@index([employeeId])
+  @@index([year, quarter])
+  @@map("social_benefits")
+}

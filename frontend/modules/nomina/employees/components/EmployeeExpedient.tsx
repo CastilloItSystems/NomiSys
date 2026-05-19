@@ -9,6 +9,7 @@ import { Button } from "primereact/button";
 import { Dialog } from "primereact/dialog";
 import { useRouter } from "next/navigation";
 import { classNames } from "primereact/utils";
+import EmployeeConceptsModal from "./EmployeeConceptsModal";
 
 import { useEmployee } from "@/modules/nomina/employees/hooks/useEmployeesData";
 import { usePositionsData } from "@/modules/nomina/positions/hooks/usePositionsData";
@@ -53,6 +54,7 @@ export default function EmployeeExpedient({
   );
   const [showDialog, setShowDialog] = useState(true);
   const [activeTab, setActiveTab] = useState(0);
+  const [showConceptsModal, setShowConceptsModal] = useState(false);
 
   const handleClose = () => {
     setShowDialog(false);
@@ -99,15 +101,16 @@ export default function EmployeeExpedient({
     );
   }
 
-  const tabsHeader = [
-    { title: "Resumen", icon: "pi-list" },
-    { title: "Datos Personales", icon: "pi-user" },
-    { title: "Datos Laborales", icon: "pi-briefcase" },
-    { title: "Seg. Social", icon: "pi-shield" },
-    { title: "Bancarios", icon: "pi-money-bill" },
-    { title: "Historial", icon: "pi-history" },
-    { title: "Auditoría", icon: "pi-book" },
-  ];
+   const tabsHeader = [
+     { title: "Resumen", icon: "pi-list" },
+     { title: "Datos Personales", icon: "pi-user" },
+     { title: "Datos Laborales", icon: "pi-briefcase" },
+     { title: "Seg. Social", icon: "pi-shield" },
+     { title: "Bancarios", icon: "pi-money-bill" },
+     { title: "Conceptos", icon: "pi-calculator" },
+     { title: "Historial", icon: "pi-history" },
+     { title: "Auditoría", icon: "pi-book" },
+   ];
 
   const currentTab = tabsHeader[activeTab];
 
@@ -492,9 +495,39 @@ export default function EmployeeExpedient({
                 <p>Información disponible en datos adicionales</p>
               </div>
             </div>
+           </TabPanel>
+
+          {/* Tab 6: Conceptos */}
+          <TabPanel header="Conceptos" leftIcon="pi pi-calculator">
+            <div className="p-3">
+              <div className="flex justify-content-between align-items-center mb-3">
+                <div>
+                  <h4 className="m-0">Conceptos de Nómina</h4>
+                  <small className="text-600">
+                    Conceptos universales y del contrato asignado
+                  </small>
+                </div>
+                <Button
+                  label="Gestionar Conceptos"
+                  icon="pi pi-pencil"
+                  onClick={() => setShowConceptsModal(true)}
+                />
+              </div>
+              <div className="text-center text-gray-500 p-4">
+                <i className="pi pi-info-circle text-2xl mb-2 block" />
+                <p>
+                  Haz clic en "Gestionar Conceptos" para ver y editar
+                  los conceptos aplicables al empleado.
+                </p>
+                <small>
+                  Podrás asignar montos manuales o excluir conceptos
+                  específicos para este empleado.
+                </small>
+              </div>
+            </div>
           </TabPanel>
 
-          {/* Tab 6: Historial (Placeholder for Phase 2) */}
+          {/* Tab 7: Historial (Placeholder for Phase 2) */}
           <TabPanel header="Historial" leftIcon="pi pi-history">
             <div className="p-3">
               <div className="text-center text-gray-500">
@@ -518,6 +551,15 @@ export default function EmployeeExpedient({
             </div>
           </TabPanel>
         </TabView>
+
+        {/* Modal para gestionar conceptos del empleado */}
+        <EmployeeConceptsModal
+          visible={showConceptsModal}
+          onHide={() => setShowConceptsModal(false)}
+          employeeId={employeeId}
+          employeeName={`${employee?.firstName || ''} ${employee?.lastName || ''}`}
+          contractTypeId={jobInfo?.contractTypeId}
+        />
       </Dialog>
     </>
   );

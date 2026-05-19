@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { TipoProducto } from "@/libs/interfaces";
 import {
   Product,

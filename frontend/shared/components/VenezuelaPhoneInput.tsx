@@ -51,7 +51,7 @@ const VenezuelaPhoneInput = forwardRef<
 
     return (
       <InputText
-        ref={ref}
+        ref={ref as any}
         type="text"
         value={value}
         onChange={handleChange}

@@ -17,15 +17,12 @@ import {
 import {
   createMembership,
   updateMembership,
+} from "@/modules/users/services/user.service";
+import type {
   Membership,
   MembershipStatus,
-} from "@/modules/users/services/user.service";
-
-const membershipSchema = z.object({
-  empresaId: z.string().min(1, "La empresa es requerida"),
-  roleId: z.string().min(1, "El rol es requerido"),
-  status: z.enum(["active", "invited", "suspended"]),
-});
+} from "@/modules/users/interfaces/user.interface";
+import { membershipSchema } from "@/modules/users/schemas/membership.schema";
 
 type FormData = z.infer<typeof membershipSchema>;
 
@@ -69,7 +66,7 @@ const MembershipForm = ({
   } = useForm<FormData>({
     resolver: zodResolver(membershipSchema),
     defaultValues: {
-      empresaId: membership?.empresaId ?? "",
+      empresaId: membership?.companyId ?? "",
       roleId: membership?.roleId ?? "",
       status: (membership?.status as MembershipStatus) ?? "active",
     },
@@ -81,9 +78,7 @@ const MembershipForm = ({
   useEffect(() => {
     getEmpresas()
       .then((res) => {
-        setEmpresas(
-          res.empresas.map((e) => ({ label: e.nombre, value: e.id_empresa })),
-        );
+        setEmpresas(res.companies.map((e) => ({ label: e.name, value: e.id })));
       })
       .catch(() => {
         toast.current?.show({
@@ -119,7 +114,7 @@ const MembershipForm = ({
   useEffect(() => {
     if (membership) {
       reset({
-        empresaId: membership.empresaId,
+        empresaId: membership.companyId,
         roleId: membership.roleId,
         status: membership.status,
       });

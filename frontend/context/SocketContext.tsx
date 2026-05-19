@@ -52,7 +52,7 @@ export const SocketProvider = ({ children }: { children: ReactNode }) => {
 
     // Usar NEXT_PUBLIC_API_BASE_URL. Removiendo '/api' al final porque los WS se conectan a la raíz.
     const apiBaseUrl =
-      process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:4000/api";
+      process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:4001/api";
     const serverPath = apiBaseUrl.replace(/\/api\/?$/, "");
 
     const socketTemp = io(serverPath, {

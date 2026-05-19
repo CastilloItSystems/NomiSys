@@ -1,41 +1,34 @@
-// backend/src/shared/constants/permissions.ts
-// Catálogo de permisos del sistema.
-// Módulos: Usuarios, Nómina
-// Patrón: module.action (ej.: users.view, departments.create)
+import { PERMISSION_MATRIX } from './permissionRegistry.js'
 
 export const PERMISSIONS = {
-  // ── Usuarios ────────────────────────────────────────────────────────────
-  USERS_VIEW: 'users.view',
-  USERS_CREATE: 'users.create',
-  USERS_UPDATE: 'users.update',
-  USERS_DELETE: 'users.delete',
-  USERS_APPROVE: 'users.approve',
+  USERS_VIEW: PERMISSION_MATRIX.users.VIEW,
+  USERS_CREATE: PERMISSION_MATRIX.users.CREATE,
+  USERS_UPDATE: PERMISSION_MATRIX.users.UPDATE,
+  USERS_DELETE: PERMISSION_MATRIX.users.DELETE,
+  USERS_APPROVE: PERMISSION_MATRIX.users.APPROVE,
 
-  // ── Nómina: Departamentos ───────────────────────────────────────────────
-  DEPARTMENTS_VIEW: 'departments.view',
-  DEPARTMENTS_CREATE: 'departments.create',
-  DEPARTMENTS_UPDATE: 'departments.update',
-  DEPARTMENTS_DELETE: 'departments.delete',
+  DEPARTMENTS_VIEW: PERMISSION_MATRIX.departments.VIEW,
+  DEPARTMENTS_CREATE: PERMISSION_MATRIX.departments.CREATE,
+  DEPARTMENTS_UPDATE: PERMISSION_MATRIX.departments.UPDATE,
+  DEPARTMENTS_DELETE: PERMISSION_MATRIX.departments.DELETE,
 
-  // ── Nómina: Posiciones/Cargos ──────────────────────────────────────────
-  POSITIONS_VIEW: 'positions.view',
-  POSITIONS_CREATE: 'positions.create',
-  POSITIONS_UPDATE: 'positions.update',
-  POSITIONS_DELETE: 'positions.delete',
+  POSITIONS_VIEW: PERMISSION_MATRIX.positions.VIEW,
+  POSITIONS_CREATE: PERMISSION_MATRIX.positions.CREATE,
+  POSITIONS_UPDATE: PERMISSION_MATRIX.positions.UPDATE,
+  POSITIONS_DELETE: PERMISSION_MATRIX.positions.DELETE,
 
-  // ── Nómina: Bancos ─────────────────────────────────────────────────────
-  BANKS_VIEW: 'banks.view',
+  BANKS_VIEW: PERMISSION_MATRIX.banks.VIEW,
+  BANKS_UPDATE: PERMISSION_MATRIX.banks.UPDATE,
+  BANKS_DELETE: PERMISSION_MATRIX.banks.DELETE,
 
-  // ── Nómina: Empleados ──────────────────────────────────────────────────
-  EMPLOYEES_VIEW: 'employees.view',
-  EMPLOYEES_CREATE: 'employees.create',
-  EMPLOYEES_UPDATE: 'employees.update',
-  EMPLOYEES_DELETE: 'employees.delete',
-  EMPLOYEES_APPROVE: 'employees.approve',
-  EMPLOYEES_EXPORT: 'employees.export',
+  EMPLOYEES_VIEW: PERMISSION_MATRIX.employees.VIEW,
+  EMPLOYEES_CREATE: PERMISSION_MATRIX.employees.CREATE,
+  EMPLOYEES_UPDATE: PERMISSION_MATRIX.employees.UPDATE,
+  EMPLOYEES_DELETE: PERMISSION_MATRIX.employees.DELETE,
+  EMPLOYEES_APPROVE: PERMISSION_MATRIX.employees.APPROVE,
+  EMPLOYEES_EXPORT: PERMISSION_MATRIX.employees.EXPORT,
 
-  // ── Reportes (compartido) ──────────────────────────────────────────────
-  REPORTS_EXPORT: 'reports.export',
+  REPORTS_EXPORT: PERMISSION_MATRIX.reports.EXPORT,
 } as const
 
 export type Permission = (typeof PERMISSIONS)[keyof typeof PERMISSIONS]

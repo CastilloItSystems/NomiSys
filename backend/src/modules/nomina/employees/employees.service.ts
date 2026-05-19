@@ -105,6 +105,7 @@ export class EmployeesService {
             departmentId: normalizedData.departmentId,
             positionId: normalizedData.positionId,
             contractType: normalizedData.contractType as string,
+            contractTypeId: normalizedData.contractTypeId ?? null,
             workSchedule: normalizedData.workSchedule as string,
             currentSalary: normalizedData.currentSalary,
             salaryType: 'USD',
@@ -344,6 +345,9 @@ export class EmployeesService {
           updateData.contractType = normalizedData.contractType
           changes.before.contractType = currentEmployee.contractType
           changes.after.contractType = normalizedData.contractType
+        }
+        if (normalizedData.contractTypeId !== undefined) {
+          updateData.contractTypeId = normalizedData.contractTypeId ?? null
         }
         if (
           normalizedData.workSchedule !== undefined &&
@@ -683,6 +687,7 @@ export class EmployeesService {
       departmentId: employee.departmentId,
       positionId: employee.positionId,
       contractType: employee.contractType,
+      contractTypeId: employee.contractTypeId ?? null,
       workSchedule: employee.workSchedule,
       currentSalary: employee.currentSalary,
       paymentFrequency: employee.paymentFrequency,

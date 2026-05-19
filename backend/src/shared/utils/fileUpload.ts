@@ -153,7 +153,7 @@ export class FileUploadHelper {
   }
 
   static getFileUrl(filename: string, subDir: string = ''): string {
-    const baseUrl = process.env.BASE_URL || 'http://localhost:3000'
+    const baseUrl = process.env.BASE_URL || 'http://localhost:4001'
     const fullPath = subDir
       ? `uploads/${subDir}/${filename}`
       : `uploads/${filename}`

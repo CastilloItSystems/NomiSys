@@ -16,7 +16,7 @@ import {
 export const usePositionsData = (search?: string) => {
   const { data, error, isLoading, mutate } = useSWR<PositionsListResponse>(
     ["positions-list", search],
-    ([, s]) => getPositions(s),
+    ([, s]: [string, string | undefined]) => getPositions(s),
     { revalidateOnFocus: false },
   );
 

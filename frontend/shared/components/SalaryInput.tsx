@@ -32,7 +32,7 @@ const SalaryInput = forwardRef<HTMLInputElement, SalaryInputProps>(
   ) => {
     return (
       <InputNumber
-        ref={ref}
+        ref={ref as any}
         value={value}
         onValueChange={(e) => onChange?.(e.value ?? null)}
         onBlur={onBlur}
@@ -43,8 +43,8 @@ const SalaryInput = forwardRef<HTMLInputElement, SalaryInputProps>(
         maxFractionDigits={2}
         min={0}
         prefix={currency === "VES" ? "Bs. " : "$ "}
-        thousandSeparator=","
-        decimalSeparator="."
+        locale="es-VE"
+        useGrouping
       />
     );
   },

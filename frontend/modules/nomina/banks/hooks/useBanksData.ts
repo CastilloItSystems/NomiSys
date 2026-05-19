@@ -16,7 +16,7 @@ import {
 export const useBanksData = (search?: string) => {
   const { data, error, isLoading, mutate } = useSWR<BanksListResponse>(
     ["banks-list", search],
-    ([, s]) => getBanks(s),
+    ([, s]: [string, string | undefined]) => getBanks(s),
     { revalidateOnFocus: false },
   );
 

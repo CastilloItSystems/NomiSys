@@ -55,6 +55,7 @@ export interface CreateEmployeeDTO {
   departmentId: string
   positionId: string
   contractType: ContractType | string
+  contractTypeId?: string | null
   workSchedule: WorkSchedule | string
 
   // Salary Information (English values)
@@ -110,6 +111,7 @@ export interface UpdateEmployeeDTO {
 
   // Labor Information (English values, optional on update)
   contractType?: ContractType | string
+  contractTypeId?: string | null
   workSchedule?: WorkSchedule | string
   supervisorId?: string
 
@@ -163,6 +165,7 @@ export interface EmployeeDTO {
   departmentId: string
   positionId: string
   contractType: string
+  contractTypeId: string | null
   workSchedule: string
 
   // Salary Information

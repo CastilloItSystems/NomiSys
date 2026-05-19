@@ -1,0 +1,23 @@
+model LeaveRequest {
+  id         String   @id @default(cuid())
+  companyId  String
+  employeeId String
+  type       String   @db.VarChar(50)
+  // Personal | Médico | Luto | Maternidad | Paternidad | Judicial | Otro
+  startDate  DateTime
+  endDate    DateTime
+  days       Int
+  reason     String   @db.Text
+  status     String   @default("Pendiente") @db.VarChar(20)
+  // Pendiente | Aprobado | Rechazado | Cancelado
+  approvedBy String?
+  isActive   Boolean  @default(true)
+
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@index([companyId])
+  @@index([employeeId])
+  @@index([status])
+  @@map("leave_requests")
+}

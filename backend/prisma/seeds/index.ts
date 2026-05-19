@@ -8,6 +8,7 @@ import seedCompanyRoles from './companyRoles.seed.js'
 import seedUsers from './users.seed.js'
 import seedMemberships from './memberships.seed.js'
 import { seedMembershipPermissions } from './membership-permissions.seed.js'
+import { seedNomina } from './nomina.seed.js'
 
 const connectionString = process.env.DATABASE_URL
 
@@ -44,6 +45,10 @@ async function main() {
 
     // Phase 6: Per-membership permission overrides
     await seedMembershipPermissions(prisma, companyId)
+    console.log('')
+
+    // Phase 7: Nomina demo data — CCP PDVSA 5×2
+    await seedNomina(prisma)
     console.log('')
 
     console.log('\n🎉 Database seeding completed successfully!')

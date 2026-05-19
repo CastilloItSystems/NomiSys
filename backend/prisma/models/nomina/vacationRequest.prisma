@@ -1,0 +1,21 @@
+model VacationRequest {
+  id         String   @id @default(cuid())
+  companyId  String
+  employeeId String
+  startDate  DateTime
+  endDate    DateTime
+  days       Int
+  reason     String?  @db.Text
+  status     String   @default("Pendiente") @db.VarChar(20)
+  // Pendiente | Aprobado | Rechazado | Cancelado
+  approvedBy String?
+  isActive   Boolean  @default(true)
+
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@index([companyId])
+  @@index([employeeId])
+  @@index([status])
+  @@map("vacation_requests")
+}

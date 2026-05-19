@@ -2,6 +2,12 @@ import { Request, Response } from 'express'
 import prisma from '../../services/prisma.service.js'
 import { ApiResponse } from '../../shared/utils/apiResponse.js'
 import { logger } from '../../shared/utils/logger.js'
+import {
+  isSuperAdminRequest,
+  logSuperAdminBypass,
+} from '../../shared/utils/superAdmin.js'
+
+const MAX_MEMBERSHIP_OVERRIDES = 10
 
 export const getMembershipsByEmpresa = async (req: Request, res: Response) => {
   try {
@@ -49,11 +55,23 @@ export const getMembershipsByEmpresa = async (req: Request, res: Response) => {
 
 export const getMembershipsByUser = async (req: Request, res: Response) => {
   const { id } = req.params
+  const isSuperAdmin = isSuperAdminRequest(req)
 
   try {
+    if (isSuperAdmin) {
+      logSuperAdminBypass(req, 'memberships.getByUser', {
+        targetUserId: String(id),
+      })
+    }
+
+    if (!isSuperAdmin && !req.companyId) {
+      return ApiResponse.badRequest(res, 'Company not specified.')
+    }
+
     const memberships = await prisma.membership.findMany({
       where: {
         userId: String(id),
+        ...(isSuperAdmin ? {} : { companyId: req.companyId }),
       },
       include: {
         company: {
@@ -87,13 +105,18 @@ export const getMembershipsByUser = async (req: Request, res: Response) => {
 
 export const createMembership = async (req: Request, res: Response) => {
   try {
-    const { userId, companyId, roleId, status } = req.body
+    const { userId, roleId, status } = req.body
+    const companyId = req.companyId
     const assignedBy = req.user?.userId || null
 
-    if (!userId || !companyId || !roleId) {
+    if (!companyId) {
+      return ApiResponse.badRequest(res, 'Company not specified.')
+    }
+
+    if (!userId || !roleId) {
       return ApiResponse.badRequest(
         res,
-        'userId, companyId and roleId are required.'
+        'userId and roleId are required.'
       )
     }
 
@@ -188,8 +211,13 @@ export const createMembership = async (req: Request, res: Response) => {
 
 export const updateMembership = async (req: Request, res: Response) => {
   const { id } = req.params
+  const isSuperAdmin = isSuperAdminRequest(req)
 
   try {
+    if (!req.companyId) {
+      return ApiResponse.badRequest(res, 'Company not specified.')
+    }
+
     const { roleId, status } = req.body
     const assignedBy = req.user?.userId || null
 
@@ -199,6 +227,20 @@ export const updateMembership = async (req: Request, res: Response) => {
 
     if (!existingMembership) {
       return ApiResponse.notFound(res, 'Membership not found.')
+    }
+
+    if (!isSuperAdmin && existingMembership.companyId !== req.companyId) {
+      return ApiResponse.forbidden(
+        res,
+        'You do not have access to this membership.'
+      )
+    }
+
+    if (isSuperAdmin) {
+      logSuperAdminBypass(req, 'memberships.update', {
+        membershipId: String(id),
+        targetCompanyId: existingMembership.companyId,
+      })
     }
 
     if (roleId) {
@@ -261,14 +303,33 @@ export const updateMembership = async (req: Request, res: Response) => {
 
 export const deleteMembership = async (req: Request, res: Response) => {
   const { id } = req.params
+  const isSuperAdmin = isSuperAdminRequest(req)
 
   try {
+    if (!req.companyId) {
+      return ApiResponse.badRequest(res, 'Company not specified.')
+    }
+
     const existingMembership = await prisma.membership.findUnique({
       where: { id: String(id) },
     })
 
     if (!existingMembership) {
       return ApiResponse.notFound(res, 'Membership not found.')
+    }
+
+    if (!isSuperAdmin && existingMembership.companyId !== req.companyId) {
+      return ApiResponse.forbidden(
+        res,
+        'You do not have access to this membership.'
+      )
+    }
+
+    if (isSuperAdmin) {
+      logSuperAdminBypass(req, 'memberships.delete', {
+        membershipId: String(id),
+        targetCompanyId: existingMembership.companyId,
+      })
     }
 
     await prisma.membership.delete({
@@ -288,8 +349,13 @@ export const deleteMembership = async (req: Request, res: Response) => {
  */
 export const getMembershipPermissions = async (req: Request, res: Response) => {
   const { id } = req.params
+  const isSuperAdmin = isSuperAdminRequest(req)
 
   try {
+    if (!req.companyId) {
+      return ApiResponse.badRequest(res, 'Company not specified.')
+    }
+
     const membership = await prisma.membership.findUnique({
       where: { id: String(id) },
       include: {
@@ -310,6 +376,20 @@ export const getMembershipPermissions = async (req: Request, res: Response) => {
 
     if (!membership) {
       return ApiResponse.notFound(res, 'Membership not found.')
+    }
+
+    if (!isSuperAdmin && membership.companyId !== req.companyId) {
+      return ApiResponse.forbidden(
+        res,
+        'You do not have access to this membership.'
+      )
+    }
+
+    if (isSuperAdmin) {
+      logSuperAdminBypass(req, 'memberships.permissions.get', {
+        membershipId: String(id),
+        targetCompanyId: membership.companyId,
+      })
     }
 
     const rolePermissions = membership.role.permissions.map(
@@ -356,22 +436,70 @@ export const setMembershipPermissions = async (req: Request, res: Response) => {
   const { id } = req.params
   const { overrides } = req.body
   const grantedBy = req.user?.userId || null
+  const isSuperAdmin = isSuperAdminRequest(req)
 
   if (!Array.isArray(overrides)) {
     return ApiResponse.badRequest(res, 'overrides must be an array.')
   }
 
+  if (overrides.length > MAX_MEMBERSHIP_OVERRIDES) {
+    return ApiResponse.badRequest(
+      res,
+      `A membership can have at most ${MAX_MEMBERSHIP_OVERRIDES} overrides.`
+    )
+  }
+
+  const uniqueCodes = new Set<string>()
+
   // Validate actions
   for (const o of overrides) {
+    if (!o?.permissionCode || typeof o.permissionCode !== 'string') {
+      return ApiResponse.badRequest(
+        res,
+        'Each override must include a valid permissionCode.'
+      )
+    }
+
+    const normalizedCode = o.permissionCode.trim()
+    if (!normalizedCode) {
+      return ApiResponse.badRequest(
+        res,
+        'Each override must include a valid permissionCode.'
+      )
+    }
+
+    if (uniqueCodes.has(normalizedCode)) {
+      return ApiResponse.badRequest(
+        res,
+        `Duplicate override for permission: ${normalizedCode}`
+      )
+    }
+
+    uniqueCodes.add(normalizedCode)
+
     if (!['GRANT', 'REVOKE'].includes(o.action)) {
       return ApiResponse.badRequest(
         res,
         `Invalid action: ${o.action}. Must be GRANT or REVOKE.`
       )
     }
+
+    if (o.action === 'REVOKE') {
+      const reason = typeof o.reason === 'string' ? o.reason.trim() : ''
+      if (!reason) {
+        return ApiResponse.badRequest(
+          res,
+          `REVOKE requires a reason for permission: ${normalizedCode}`
+        )
+      }
+    }
   }
 
   try {
+    if (!req.companyId) {
+      return ApiResponse.badRequest(res, 'Company not specified.')
+    }
+
     const membership = await prisma.membership.findUnique({
       where: { id: String(id) },
     })
@@ -380,8 +508,23 @@ export const setMembershipPermissions = async (req: Request, res: Response) => {
       return ApiResponse.notFound(res, 'Membership not found.')
     }
 
+    if (!isSuperAdmin && membership.companyId !== req.companyId) {
+      return ApiResponse.forbidden(
+        res,
+        'You do not have access to this membership.'
+      )
+    }
+
+    if (isSuperAdmin) {
+      logSuperAdminBypass(req, 'memberships.permissions.set', {
+        membershipId: String(id),
+        targetCompanyId: membership.companyId,
+        overrideCount: overrides.length,
+      })
+    }
+
     // Resolve Permission IDs from codes
-    const codes: string[] = overrides.map((o: any) => o.permissionCode)
+    const codes: string[] = overrides.map((o: any) => o.permissionCode.trim())
     const found =
       codes.length > 0
         ? await prisma.permission.findMany({ where: { code: { in: codes } } })
@@ -402,9 +545,10 @@ export const setMembershipPermissions = async (req: Request, res: Response) => {
         await tx.membershipPermission.createMany({
           data: overrides.map((o: any) => ({
             membershipId: String(id),
-            permissionId: found.find((p) => p.code === o.permissionCode)!.id,
+            permissionId: found.find((p) => p.code === o.permissionCode.trim())!
+              .id,
             action: o.action as 'GRANT' | 'REVOKE',
-            reason: o.reason || null,
+            reason: typeof o.reason === 'string' ? o.reason.trim() || null : null,
             grantedBy,
           })),
         })

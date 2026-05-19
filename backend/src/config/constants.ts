@@ -5,7 +5,7 @@ export const APP_CONFIG = {
   VERSION: '1.0.0',
   DESCRIPTION: 'Sistema de inventario para taller mecánico - Venezuela',
   API_PREFIX: '/api',
-  PORT: process.env.PORT || 3000,
+  PORT: process.env.PORT || 4001,
   NODE_ENV: process.env.NODE_ENV || 'development',
 }
 

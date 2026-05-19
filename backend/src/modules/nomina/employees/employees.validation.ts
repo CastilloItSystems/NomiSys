@@ -33,6 +33,7 @@ export const createEmployeeSchema = Joi.object<CreateEmployeeDTO>({
   contractType: Joi.string()
     .valid('INDEFINITE', 'FIXED_TERM', 'TEMPORARY', 'PROJECT')
     .required(),
+  contractTypeId: Joi.string().trim().optional().allow(null, ''),
   workSchedule: Joi.string()
     .valid('FULL_TIME', 'PART_TIME', 'EVENING')
     .optional(),
@@ -109,6 +110,7 @@ export const updateEmployeeSchema = Joi.object<UpdateEmployeeDTO>({
   contractType: Joi.string()
     .valid('INDEFINITE', 'FIXED_TERM', 'TEMPORARY', 'PROJECT')
     .optional(),
+  contractTypeId: Joi.string().trim().optional().allow(null, ''),
   workSchedule: Joi.string()
     .valid('FULL_TIME', 'PART_TIME', 'EVENING')
     .optional(),

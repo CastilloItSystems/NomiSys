@@ -20,9 +20,8 @@ import {
   deleteUser,
   getUsers,
   getAuditLogsForUser,
-  User,
-  AuditLog,
 } from "@/modules/users/services/user.service";
+import type { AuditLog, User } from "@/modules/users/interfaces/user.interface";
 import FormActionButtons from "@/shared/components/FormActionButtons";
 import CreateButton from "@/shared/components/CreateButton";
 import DeleteConfirmDialog from "@/shared/components/DeleteConfirmDialog";

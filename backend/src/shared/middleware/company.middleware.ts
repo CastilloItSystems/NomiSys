@@ -3,6 +3,8 @@ import prisma from '../../services/prisma.service.js'
 import { ApiResponse } from '../utils/apiResponse.js'
 import { createTenantPrisma } from '../../services/prisma-tenant.service.js'
 import { logger } from '../utils/logger.js'
+import { isSuperAdminRequest, logSuperAdminBypass } from '../utils/superAdmin.js'
+import { resolveMembershipPermissions } from '../utils/resolvePermissions.js'
 
 export const extractCompany = async (
   req: Request,
@@ -26,6 +28,30 @@ export const extractCompany = async (
       return ApiResponse.badRequest(res, 'Header X-Company-Id is required')
     }
 
+    if (isSuperAdminRequest(req)) {
+      logSuperAdminBypass(req, 'extractCompany', {
+        targetCompanyId: companyId,
+      })
+
+      const company = await prisma.company.findUnique({
+        where: { id: companyId },
+        select: { id: true, deleted: true },
+      })
+
+      if (!company || company.deleted) {
+        return ApiResponse.notFound(res, 'Company not found')
+      }
+
+      req.companyId = companyId
+      req.prisma = createTenantPrisma(companyId)
+      req.authz = {
+        permissions: new Set<string>(),
+        isSuperAdmin: true,
+      }
+
+      return next()
+    }
+
     const membership = await prisma.membership.findUnique({
       where: {
         userId_companyId: {
@@ -34,7 +60,28 @@ export const extractCompany = async (
         },
       },
       include: {
-        role: true,
+        role: {
+          include: {
+            permissions: {
+              include: {
+                permission: {
+                  select: {
+                    code: true,
+                  },
+                },
+              },
+            },
+          },
+        },
+        permissions: {
+          include: {
+            permission: {
+              select: {
+                code: true,
+              },
+            },
+          },
+        },
       },
     })
 
@@ -55,6 +102,15 @@ export const extractCompany = async (
     req.companyId = companyId
     req.prisma = createTenantPrisma(companyId)
     req.membership = membership
+    req.authz = {
+      permissions: new Set(
+        resolveMembershipPermissions(
+          membership.role.permissions,
+          membership.permissions
+        )
+      ),
+      isSuperAdmin: false,
+    }
 
     return next()
   } catch (error: unknown) {
@@ -91,6 +147,30 @@ export const extractCompanyFromParam = async (
       return ApiResponse.badRequest(res, 'Company ID is required in the URL')
     }
 
+    if (isSuperAdminRequest(req)) {
+      logSuperAdminBypass(req, 'extractCompanyFromParam', {
+        targetCompanyId: companyId,
+      })
+
+      const company = await prisma.company.findUnique({
+        where: { id: companyId },
+        select: { id: true, deleted: true },
+      })
+
+      if (!company || company.deleted) {
+        return ApiResponse.notFound(res, 'Company not found')
+      }
+
+      req.companyId = companyId
+      req.prisma = createTenantPrisma(companyId)
+      req.authz = {
+        permissions: new Set<string>(),
+        isSuperAdmin: true,
+      }
+
+      return next()
+    }
+
     const membership = await prisma.membership.findUnique({
       where: {
         userId_companyId: {
@@ -99,7 +179,28 @@ export const extractCompanyFromParam = async (
         },
       },
       include: {
-        role: true,
+        role: {
+          include: {
+            permissions: {
+              include: {
+                permission: {
+                  select: {
+                    code: true,
+                  },
+                },
+              },
+            },
+          },
+        },
+        permissions: {
+          include: {
+            permission: {
+              select: {
+                code: true,
+              },
+            },
+          },
+        },
       },
     })
 
@@ -120,6 +221,15 @@ export const extractCompanyFromParam = async (
     req.companyId = companyId
     req.prisma = createTenantPrisma(companyId)
     req.membership = membership
+    req.authz = {
+      permissions: new Set(
+        resolveMembershipPermissions(
+          membership.role.permissions,
+          membership.permissions
+        )
+      ),
+      isSuperAdmin: false,
+    }
 
     return next()
   } catch (error: unknown) {

@@ -1,56 +1,14 @@
 // backend/src/shared/middleware/authorize.middleware.ts
 import { Request, Response, NextFunction } from 'express'
 import { ForbiddenError, UnauthorizedError } from '../utils/apiError.js'
-import prisma from '../../services/prisma.service.js'
+import { isSuperAdminRequest, logSuperAdminBypass } from '../utils/superAdmin.js'
 
 // Evaluated per-request so dotenv has time to load before the first check
 const skipAuthzInTests = () =>
   process.env.NODE_ENV === 'test' && process.env.SKIP_AUTHZ_IN_TESTS === 'true'
 
-async function getEffectivePermissions(
-  membershipId: string
-): Promise<Set<string>> {
-  const membership = await prisma.membership.findUnique({
-    where: { id: membershipId },
-    include: {
-      role: {
-        include: {
-          permissions: {
-            include: {
-              permission: true,
-            },
-          },
-        },
-      },
-      permissions: {
-        include: {
-          permission: true,
-        },
-      },
-    },
-  })
-
-  if (!membership) {
-    return new Set()
-  }
-
-  const effectivePermissions = new Set<string>()
-
-  for (const rp of membership.role.permissions) {
-    effectivePermissions.add(rp.permission.code)
-  }
-
-  for (const mp of membership.permissions) {
-    if (mp.action === 'GRANT') {
-      effectivePermissions.add(mp.permission.code)
-    }
-
-    if (mp.action === 'REVOKE') {
-      effectivePermissions.delete(mp.permission.code)
-    }
-  }
-
-  return effectivePermissions
+function getRequestPermissions(req: Request): Set<string> {
+  return req.authz?.permissions || new Set<string>()
 }
 
 export const authorize = (...requiredPermissions: string[]) => {
@@ -65,13 +23,20 @@ export const authorize = (...requiredPermissions: string[]) => {
       throw new UnauthorizedError('Usuario no autenticado')
     }
 
+    if (isSuperAdminRequest(req)) {
+      logSuperAdminBypass(req, 'authorize', {
+        requiredPermissions,
+      })
+      return next()
+    }
+
     if (!req.membership?.id) {
       throw new ForbiddenError(
         'No se encontró la membresía activa para esta empresa'
       )
     }
 
-    const userPermissions = await getEffectivePermissions(req.membership.id)
+    const userPermissions = getRequestPermissions(req)
 
     const hasAllPermissions = requiredPermissions.every((permission) =>
       userPermissions.has(permission)
@@ -96,13 +61,20 @@ export const authorizeAny = (...requiredPermissions: string[]) => {
       throw new UnauthorizedError('Usuario no autenticado')
     }
 
+    if (isSuperAdminRequest(req)) {
+      logSuperAdminBypass(req, 'authorizeAny', {
+        requiredPermissions,
+      })
+      return next()
+    }
+
     if (!req.membership?.id) {
       throw new ForbiddenError(
         'No se encontró la membresía activa para esta empresa'
       )
     }
 
-    const userPermissions = await getEffectivePermissions(req.membership.id)
+    const userPermissions = getRequestPermissions(req)
 
     const hasAnyPermission = requiredPermissions.some((permission) =>
       userPermissions.has(permission)
@@ -122,6 +94,13 @@ export const authorizeRoles = (...allowedRoles: string[]) => {
 
     if (!req.user) {
       throw new UnauthorizedError('Usuario no autenticado')
+    }
+
+    if (isSuperAdminRequest(req)) {
+      logSuperAdminBypass(req, 'authorizeRoles', {
+        allowedRoles,
+      })
+      return next()
     }
 
     const roleName = req.membership?.role?.name

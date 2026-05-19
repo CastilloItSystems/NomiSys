@@ -152,6 +152,29 @@ model MembershipPermission {
 }
 
 
+model Attendance {
+  id         String   @id @default(cuid())
+  companyId  String
+  employeeId String
+  date       DateTime
+  status     String   @db.VarChar(20)
+  // Presente | Ausente | Tardanza | Permiso | Vacaciones | Feriado
+  checkIn    DateTime?
+  checkOut   DateTime?
+  notes      String?  @db.Text
+  isActive   Boolean  @default(true)
+
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@unique([companyId, employeeId, date])
+  @@index([companyId])
+  @@index([employeeId])
+  @@index([date])
+  @@map("attendance")
+}
+
+
 model Bank {
   id        String   @id @default(cuid())
   name      String   @unique @db.VarChar(100) // Bank name, globally unique
@@ -164,6 +187,25 @@ model Bank {
   @@index([isActive]) // Fast filter by active status
   @@index([code])     // Fast lookup by code
   @@map("banks")
+}
+
+
+model ContractType {
+  id          String   @id @default(cuid())
+  companyId   String
+  name        String   @db.VarChar(100)
+  description String?  @db.Text
+  isActive    Boolean  @default(true)
+
+  // Inverse relations
+  concepts    SalaryConcept[] @relation("ContractTypeConcepts")
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@unique([companyId, name])
+  @@index([companyId])
+  @@map("contract_types")
 }
 
 
@@ -211,7 +253,8 @@ model Employee {
   departmentId    String   // FK → Department
   positionId      String   // FK → Position
   costCenter      String?  @db.VarChar(50)
-  contractType    String   @db.VarChar(50)  // Indefinido, Determinado, Obra, Pasantía
+  contractType    String   @db.VarChar(50)  // Indefinido, Determinado, Obra, Pasantía (legacy label)
+  contractTypeId  String?  // FK → ContractType (null = no specific contract type assigned)
   workSchedule    String?   @db.VarChar(50)  // Completa, Parcial, Mixta, Nocturna
   currentSalary   Decimal  @db.Decimal(15,2)
   salaryType      String   @db.VarChar(10)  // VES, USD
@@ -251,7 +294,56 @@ model Employee {
   @@index([supervisorId])
   @@index([status])
   @@index([isActive])
+  @@index([contractTypeId])
   @@map("employees")
+}
+
+
+// Per-employee concept settings: manual amounts, disabled concepts, notes.
+// This allows customizing payroll concepts for specific employees.
+model EmployeeConcept {
+  id           String   @id @default(cuid())
+  companyId    String
+  employeeId   String
+  conceptId    String   // FK → SalaryConcept
+  manualAmount Decimal? @db.Decimal(15,2)  // Override formula result (null = use formula)
+  disabled     Boolean  @default(false)        // Skip this concept for this employee
+  notes        String?  @db.Text
+
+  // Relations
+  concept      SalaryConcept? @relation(fields: [conceptId], references: [id])
+
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  @@unique([companyId, employeeId, conceptId])
+  @@index([companyId])
+  @@index([employeeId])
+  @@index([conceptId])
+  @@map("employee_concepts")
+}
+
+
+model EmployeeDeduction {
+  id          String   @id @default(cuid())
+  companyId   String
+  employeeId  String
+  conceptId   String   // FK → SalaryConcept
+  calcType    String   @db.VarChar(20)  // Porcentaje | Monto Fijo
+  amount      Decimal? @db.Decimal(15,2)
+  percentage  Decimal? @db.Decimal(5,4)
+  description String?  @db.Text
+  startDate   DateTime
+  endDate     DateTime?
+  isActive    Boolean  @default(true)
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([companyId])
+  @@index([employeeId])
+  @@index([conceptId])
+  @@map("employee_deductions")
 }
 
 
@@ -312,6 +404,219 @@ model EmployeeStatusHistory {
 }
 
 
+model LeaveRequest {
+  id         String   @id @default(cuid())
+  companyId  String
+  employeeId String
+  type       String   @db.VarChar(50)
+  // Personal | Médico | Luto | Maternidad | Paternidad | Judicial | Otro
+  startDate  DateTime
+  endDate    DateTime
+  days       Int
+  reason     String   @db.Text
+  status     String   @default("Pendiente") @db.VarChar(20)
+  // Pendiente | Aprobado | Rechazado | Cancelado
+  approvedBy String?
+  isActive   Boolean  @default(true)
+
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@index([companyId])
+  @@index([employeeId])
+  @@index([status])
+  @@map("leave_requests")
+}
+
+
+model Loan {
+  id                String   @id @default(cuid())
+  companyId         String
+  employeeId        String
+  amount            Decimal  @db.Decimal(15,2)
+  remainingBalance  Decimal  @db.Decimal(15,2)
+  installments      Int
+  installmentAmount Decimal  @db.Decimal(15,2)
+  startDate         DateTime
+  endDate           DateTime?
+  reason            String?  @db.Text
+  status            String   @default("Activo") @db.VarChar(20)
+  // Activo | Pagado | Cancelado
+  isActive          Boolean  @default(true)
+
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  @@index([companyId])
+  @@index([employeeId])
+  @@index([status])
+  @@map("loans")
+}
+
+
+model Overtime {
+  id         String   @id @default(cuid())
+  companyId  String
+  employeeId String
+  date       DateTime
+  hours      Decimal  @db.Decimal(5,2)
+  type       String   @db.VarChar(30)
+  // Diurna | Nocturna | Feriada Diurna | Feriada Nocturna
+  reason     String?  @db.Text
+  status     String   @default("Pendiente") @db.VarChar(20)
+  // Pendiente | Aprobado | Rechazado
+  approvedBy String?
+  isActive   Boolean  @default(true)
+
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@index([companyId])
+  @@index([employeeId])
+  @@index([status])
+  @@map("overtime")
+}
+
+
+model PayrollConfig {
+  id              String   @id @default(cuid())
+  companyId       String   @unique
+  salarioMinimo   Decimal  @default(0) @db.Decimal(15,2)
+  salarioMinimoBs Decimal  @default(0) @db.Decimal(15,2)
+  tasaCambio      Decimal  @default(1) @db.Decimal(15,6)
+  ivssRate        Decimal  @default(0.04) @db.Decimal(5,4)
+  faovRate        Decimal  @default(0.01) @db.Decimal(5,4)
+  incesRate       Decimal  @default(0.005) @db.Decimal(5,4)
+  ivssMaxSalarios Int      @default(5)  // Tope: N salarios mínimos
+
+  // Bono de Alimentación (Cesta Ticket) — obligatorio LOTTT
+  bonoAlimentacion   Decimal @default(0) @db.Decimal(15,2) // monto diario en VES
+  bonoAlimentacionAplica Boolean @default(true)
+
+  // Utilidades — días mínimos por ley (LOTTT Art. 131 = 15 días)
+  utilidadesDias  Int     @default(15)
+
+  // ISLR — retención estimada mensual (porcentaje aplicado al exceso)
+  islrAplica      Boolean @default(false)
+  islrUMT         Decimal @default(0) @db.Decimal(15,2) // Unidad Municipal Tributaria
+
+  // Prestaciones Sociales — días garantía por trimestre (LOTTT Art. 142 = 15 días)
+  prestacionesDiasGarantia Int @default(15)
+
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@map("payroll_config")
+}
+
+
+model PayrollPeriod {
+  id          String   @id @default(cuid())
+  companyId   String   // FK to Company (multi-tenancy)
+
+  name        String   @db.VarChar(150) // Ej: "Quincena 1 - Enero 2026"
+  frequency   String   @db.VarChar(20)  // Semanal, Quincenal, Mensual
+
+  startDate   DateTime
+  endDate     DateTime
+  paymentDate DateTime
+
+  status      String   @default("Borrador") @db.VarChar(20)
+  // Borrador | Abierto | Cerrado | Pagado
+
+  isActive    Boolean  @default(true)
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@unique([companyId, name])    // Nombre único por empresa
+  @@index([companyId])
+  @@index([status])
+  @@index([frequency])
+  @@index([startDate])
+  @@map("payroll_periods")
+}
+
+
+model PayrollRun {
+  id              String    @id @default(cuid())
+  companyId       String
+  periodId        String    // FK → PayrollPeriod
+
+  runType         String    @default("Regular") @db.VarChar(30)
+  // Regular | Utilidades | VacacionesEspeciales | PrestacionesSociales
+
+  status          String    @default("Borrador") @db.VarChar(20)
+  // Borrador | Procesando | Procesado | Aprobado | Pagado | Anulado
+
+  totalGross      Decimal   @default(0) @db.Decimal(15,2)
+  totalDeductions Decimal   @default(0) @db.Decimal(15,2)
+  totalNet        Decimal   @default(0) @db.Decimal(15,2)
+  employeeCount   Int       @default(0)
+
+  notes           String?   @db.Text
+  processedAt     DateTime?
+  approvedAt      DateTime?
+  paidAt          DateTime?
+
+  isActive        Boolean   @default(true)
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  @@unique([companyId, periodId, runType])
+  @@index([companyId])
+  @@index([status])
+  @@index([runType])
+  @@map("payroll_runs")
+}
+
+
+// Stores per-employee variable inputs for a payroll run.
+// RR.HH. enters these values (e.g. hours worked, travel hours) before processing.
+// The formula engine reads them to evaluate concepts that declare inputVars.
+model PayrollRunInput {
+  id         String   @id @default(cuid())
+  companyId  String
+  runId      String
+  employeeId String
+  // Arbitrary key-value map: { "horas_viaje": 12, "horas_bono_nocturno": 3.5 }
+  vars       Json     @default("{}")
+
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@unique([runId, employeeId])
+  @@index([companyId])
+  @@index([runId])
+  @@map("payroll_run_inputs")
+}
+
+
+model PayrollRunLine {
+  id              String   @id @default(cuid())
+  companyId       String
+  runId           String   // FK → PayrollRun
+  employeeId      String
+
+  grossSalary     Decimal  @db.Decimal(15,2)
+  totalDeductions Decimal  @db.Decimal(15,2)
+  netSalary       Decimal  @db.Decimal(15,2)
+
+  // JSON breakdown: { concepts: [{name, type, amount}], ... }
+  details         Json
+
+  isActive        Boolean  @default(true)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@unique([runId, employeeId])
+  @@index([companyId])
+  @@index([runId])
+  @@index([employeeId])
+  @@map("payroll_run_lines")
+}
+
+
 model Position {
   id            String   @id @default(cuid())
   companyId     String   // FK to Company (no direct relation, text only for multi-tenancy)
@@ -328,6 +633,106 @@ model Position {
   @@index([companyId])        // Fast lookup by company
   @@index([isActive])         // Fast filter by active status
   @@map("positions")
+}
+
+
+model SalaryConcept {
+  id             String   @id @default(cuid())
+  companyId      String
+  name           String   @db.VarChar(100)
+  code           String   @db.VarChar(20)
+  type           String   @db.VarChar(30)  // Ingreso | Deducción | Aporte Patronal
+  description    String?  @db.Text
+  isTaxable      Boolean  @default(true)
+  isActive       Boolean  @default(true)
+
+  // Formula engine
+  // If set, the concept amount is computed by evaluating this expression.
+  // Available variables: salario_basico, salario_diario, dias_trabajados,
+  //   horas_jornada, plus the CODE of any prior concept (e.g. "A + C / dias_trabajados")
+  // and any inputVars declared below (e.g. "horas_viaje").
+  formula        String?  @db.Text
+  executionOrder Int      @default(0)      // lower = evaluated first
+  // Names of per-employee variables RR.HH. must supply before processing
+  // e.g. ["horas_viaje", "horas_bono_nocturno"]
+  inputVars      String[] @default([])
+
+  // Scope: null = universal (all employees), set = only employees with this contractTypeId
+  contractTypeId String?
+  contractType   ContractType? @relation("ContractTypeConcepts", fields: [contractTypeId], references: [id])
+
+  // Inverse relation to EmployeeConcept
+  employeeConcepts EmployeeConcept[]
+
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  @@unique([companyId, code])
+  @@index([companyId])
+  @@index([type])
+  @@index([executionOrder])
+  @@index([contractTypeId])
+  @@map("salary_concepts")
+}
+
+
+// Prestaciones Sociales — Garantía (LOTTT Art. 142)
+// Se acumula trimestralmente: 15 días de salario integral por trimestre
+model SocialBenefit {
+  id          String   @id @default(cuid())
+  companyId   String
+  employeeId  String
+
+  // Período al que corresponde (ej. "Q1-2026", "Q2-2026")
+  period      String   @db.VarChar(20)
+  year        Int
+  quarter     Int      // 1, 2, 3, 4
+
+  // Salario integral del trimestre (salario + alícuota utilidades + alícuota bono vacacional)
+  salarioIntegral Decimal @db.Decimal(15,2)
+  diasGarantia    Int     @default(15)
+  monto           Decimal @db.Decimal(15,2) // salarioIntegral * diasGarantia / 30
+
+  // Acumulado hasta este trimestre
+  montoAcumulado  Decimal @db.Decimal(15,2) @default(0)
+
+  status      String   @default("Activo") @db.VarChar(20)
+  // Activo | Liquidado (al egresar el empleado)
+
+  notes       String?  @db.Text
+
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@unique([companyId, employeeId, year, quarter])
+  @@index([companyId])
+  @@index([employeeId])
+  @@index([year, quarter])
+  @@map("social_benefits")
+}
+
+
+model VacationRequest {
+  id         String   @id @default(cuid())
+  companyId  String
+  employeeId String
+  startDate  DateTime
+  endDate    DateTime
+  days       Int
+  reason     String?  @db.Text
+  status     String   @default("Pendiente") @db.VarChar(20)
+  // Pendiente | Aprobado | Rechazado | Cancelado
+  approvedBy String?
+  isActive   Boolean  @default(true)
+
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@index([companyId])
+  @@index([employeeId])
+  @@index([status])
+  @@map("vacation_requests")
 }
 
 

@@ -37,7 +37,7 @@ export default function AdditionalDataSection({
         />
         {errors.emergencyContactName && (
           <small className="p-error">
-            {errors.emergencyContactName.message}
+            {errors.emergencyContactName.message as string}
           </small>
         )}
       </div>
@@ -77,7 +77,7 @@ export default function AdditionalDataSection({
           className={classNames({ "p-invalid": errors.observations })}
         />
         {errors.observations && (
-          <small className="p-error">{errors.observations.message}</small>
+          <small className="p-error">{errors.observations.message as string}</small>
         )}
       </div>
     </div>

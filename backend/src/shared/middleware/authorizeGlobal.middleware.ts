@@ -6,6 +6,7 @@
 import { Request, Response, NextFunction } from 'express'
 import { ForbiddenError, UnauthorizedError } from '../utils/apiError.js'
 import prisma from '../../services/prisma.service.js'
+import { isSuperAdminRequest, logSuperAdminBypass } from '../utils/superAdmin.js'
 
 const GLOBAL_ADMIN_ROLES = ['OWNER', 'ADMIN']
 
@@ -33,6 +34,13 @@ export const authorizeGlobal = (...allowedRoles: string[]) => {
 
     if (!req.user) {
       throw new UnauthorizedError('Usuario no autenticado')
+    }
+
+    if (isSuperAdminRequest(req)) {
+      logSuperAdminBypass(req, 'authorizeGlobal', {
+        allowedRoles: roles,
+      })
+      return next()
     }
 
     const membership = await prisma.membership.findFirst({

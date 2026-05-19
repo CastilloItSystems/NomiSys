@@ -1,0 +1,31 @@
+model PayrollRun {
+  id              String    @id @default(cuid())
+  companyId       String
+  periodId        String    // FK → PayrollPeriod
+
+  runType         String    @default("Regular") @db.VarChar(30)
+  // Regular | Utilidades | VacacionesEspeciales | PrestacionesSociales
+
+  status          String    @default("Borrador") @db.VarChar(20)
+  // Borrador | Procesando | Procesado | Aprobado | Pagado | Anulado
+
+  totalGross      Decimal   @default(0) @db.Decimal(15,2)
+  totalDeductions Decimal   @default(0) @db.Decimal(15,2)
+  totalNet        Decimal   @default(0) @db.Decimal(15,2)
+  employeeCount   Int       @default(0)
+
+  notes           String?   @db.Text
+  processedAt     DateTime?
+  approvedAt      DateTime?
+  paidAt          DateTime?
+
+  isActive        Boolean   @default(true)
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  @@unique([companyId, periodId, runType])
+  @@index([companyId])
+  @@index([status])
+  @@index([runType])
+  @@map("payroll_runs")
+}

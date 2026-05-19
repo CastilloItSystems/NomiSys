@@ -10,9 +10,11 @@ import { Toast } from "primereact/toast";
 import {
   getMembershipPermissions,
   setMembershipPermissions,
+} from "@/modules/users/services/user.service";
+import type {
   MembershipPermissionOverride,
   MembershipPermissionsResponse,
-} from "@/modules/users/services/user.service";
+} from "@/modules/users/interfaces/user.interface";
 
 import {
   PERMISSION_GROUPS,
@@ -23,6 +25,8 @@ import {
 // ── Tipos ─────────────────────────────────────────────────────────────────
 
 type OverrideState = "inherit" | "grant" | "revoke";
+const MAX_MEMBERSHIP_OVERRIDES = 10;
+type PresetType = "read_only" | "operator";
 
 interface MembershipPermissionsProps {
   visible: boolean;
@@ -46,6 +50,7 @@ const MembershipPermissions = ({
   const [saving, setSaving] = useState(false);
   const [search, setSearch] = useState("");
   const [states, setStates] = useState<Record<string, OverrideState>>({});
+  const [revokeReason, setRevokeReason] = useState("");
   const [dirty, setDirty] = useState(false);
 
   const load = useCallback(async () => {
@@ -65,6 +70,10 @@ const MembershipPermissions = ({
           override.action === "GRANT" ? "grant" : "revoke";
       }
       setStates(initial);
+      const firstRevokeReason =
+        res.overrides.find((override) => override.action === "REVOKE")
+          ?.reason ?? "";
+      setRevokeReason(firstRevokeReason);
       setDirty(false);
     } catch {
       toast.current?.show({
@@ -101,10 +110,67 @@ const MembershipPermissions = ({
     const cleared: Record<string, OverrideState> = {};
     for (const perm of ALL_PERMISSIONS) cleared[perm] = "inherit";
     setStates(cleared);
+    setRevokeReason("");
+    setDirty(true);
+  };
+
+  const applyPreset = (preset: PresetType) => {
+    const next: Record<string, OverrideState> = {};
+
+    for (const perm of ALL_PERMISSIONS) {
+      const action = perm.split(".")[1] ?? "";
+
+      if (preset === "read_only") {
+        next[perm] = action === "view" ? "inherit" : "revoke";
+        continue;
+      }
+
+      // operator
+      if (action === "delete" || action === "approve" || action === "export") {
+        next[perm] = "revoke";
+      } else {
+        next[perm] = "inherit";
+      }
+    }
+
+    setStates(next);
+    if (!revokeReason.trim()) {
+      setRevokeReason(
+        preset === "read_only"
+          ? "Plantilla solo lectura"
+          : "Plantilla operador sin acciones críticas",
+      );
+    }
     setDirty(true);
   };
 
   const handleSave = async () => {
+    const hasRevokes = Object.values(states).some((s) => s === "revoke");
+    const normalizedReason = revokeReason.trim();
+    const selectedOverrides = Object.values(states).filter(
+      (s) => s !== "inherit",
+    ).length;
+
+    if (selectedOverrides > MAX_MEMBERSHIP_OVERRIDES) {
+      toast.current?.show({
+        severity: "warn",
+        summary: "Límite de overrides",
+        detail: `Máximo ${MAX_MEMBERSHIP_OVERRIDES} overrides por membership.`,
+        life: 3500,
+      });
+      return;
+    }
+
+    if (hasRevokes && !normalizedReason) {
+      toast.current?.show({
+        severity: "warn",
+        summary: "Motivo requerido",
+        detail: "Debes indicar el motivo cuando haya permisos en REVOKE.",
+        life: 3500,
+      });
+      return;
+    }
+
     setSaving(true);
     try {
       const overrides: MembershipPermissionOverride[] = Object.entries(states)
@@ -112,6 +178,7 @@ const MembershipPermissions = ({
         .map(([code, s]) => ({
           permissionCode: code,
           action: s === "grant" ? "GRANT" : "REVOKE",
+          reason: s === "revoke" ? normalizedReason : undefined,
         }));
 
       await setMembershipPermissions(membershipId, overrides);
@@ -245,9 +312,43 @@ const MembershipPermissions = ({
               <i className="pi pi-ban" />
               <span>Forzar REVOKE (quitar aunque el rol lo tenga)</span>
             </div>
+            <div className="flex align-items-center gap-1 text-700">
+              <i className="pi pi-info-circle" />
+              <span>Máximo {MAX_MEMBERSHIP_OVERRIDES} overrides</span>
+            </div>
             <span className="text-400 ml-auto">
               Click en un botón para cambiar su estado
             </span>
+          </div>
+
+          <div className="flex gap-2 flex-wrap">
+            <Button
+              label="Preset Solo lectura"
+              icon="pi pi-eye"
+              size="small"
+              outlined
+              severity="secondary"
+              onClick={() => applyPreset("read_only")}
+              disabled={saving}
+            />
+            <Button
+              label="Preset Operador"
+              icon="pi pi-briefcase"
+              size="small"
+              outlined
+              severity="secondary"
+              onClick={() => applyPreset("operator")}
+              disabled={saving}
+            />
+            <Button
+              label="Sin overrides"
+              icon="pi pi-undo"
+              size="small"
+              outlined
+              severity="secondary"
+              onClick={resetAll}
+              disabled={saving}
+            />
           </div>
 
           {/* Buscador */}
@@ -260,6 +361,23 @@ const MembershipPermissions = ({
               className="w-full"
             />
           </span>
+
+          {revokes > 0 && (
+            <div className="surface-50 border-round p-3">
+              <label className="block text-sm font-semibold mb-2">
+                Motivo de los REVOKE <span className="text-red-500">*</span>
+              </label>
+              <InputText
+                value={revokeReason}
+                onChange={(e) => {
+                  setRevokeReason(e.target.value);
+                  setDirty(true);
+                }}
+                placeholder="Ej: Restricción temporal por revisión de acceso"
+                className="w-full"
+              />
+            </div>
+          )}
 
           {/* Grupos */}
           <div

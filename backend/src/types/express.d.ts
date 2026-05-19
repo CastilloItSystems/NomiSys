@@ -17,6 +17,10 @@ declare global {
       membership?: Membership & {
         role?: CompanyRole
       }
+      authz?: {
+        permissions: Set<string>
+        isSuperAdmin?: boolean
+      }
       validatedBody?: unknown
       validatedQuery?: unknown
       validatedParams?: unknown

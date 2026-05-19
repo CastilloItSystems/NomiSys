@@ -3,9 +3,7 @@ import { logger } from '../shared/utils/logger.js'
 
 // Pre-calcular orígenes permitidos usando Set para lookup O(1)
 const staticOrigins = new Set([
-  'http://localhost:3000', // Frontend development
   'http://localhost:3001',
-  'http://127.0.0.1:3000',
   'http://127.0.0.1:3001',
   'https://nomisys.vercel.app', // Production frontend
 ])

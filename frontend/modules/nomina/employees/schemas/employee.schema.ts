@@ -52,6 +52,7 @@ export const laboralDataSchema = z.object({
   contractType: z.enum(["INDEFINITE", "FIXED_TERM", "PROJECT", "INTERNSHIP"], {
     errorMap: () => ({ message: "Tipo de contrato no válido" }),
   }),
+  contractTypeId: z.string().optional().nullable(),
   workShift: z.enum(["FULL_TIME", "PART_TIME", "MIXED", "NIGHT"], {
     errorMap: () => ({ message: "Tipo de jornada no válido" }),
   }),
@@ -137,6 +138,7 @@ export const updateEmployeeSchema = z
     contractType: z
       .enum(["INDEFINITE", "FIXED_TERM", "PROJECT", "INTERNSHIP"])
       .optional(),
+    contractTypeId: z.string().optional().nullable(),
     workShift: z.enum(["FULL_TIME", "PART_TIME", "MIXED", "NIGHT"]).optional(),
     payFrequency: z.enum(["WEEKLY", "BIWEEKLY", "MONTHLY"]).optional(),
     supervisorId: z.string().optional().or(z.literal("")),

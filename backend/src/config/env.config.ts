@@ -12,7 +12,7 @@ const optional = (key: string, fallback: string): string =>
 
 export const env = {
   NODE_ENV: optional('NODE_ENV', 'development'),
-  PORT: parseInt(optional('PORT', '3000'), 10),
+  PORT: parseInt(optional('PORT', '4001'), 10),
   DATABASE_URL: required('DATABASE_URL'),
   JWT_SECRET: required('JWT_SECRET'),
   JWT_EXPIRES_IN: optional('JWT_EXPIRES_IN', '7d'),

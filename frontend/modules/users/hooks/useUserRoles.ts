@@ -12,8 +12,8 @@ export function useUserRoles(): string[] {
 
   if (user) {
     // Si el rol viene como propiedad directa (tu estructura actual)
-    if (typeof user.rol === "string") {
-      userRoles = [user.rol];
+    if (typeof (user as any).rol === "string") {
+      userRoles = [(user as any).rol];
     }
     // Soporte legacy o futuro para múltiples roles si existiera esa propiedad
     else if (Array.isArray((user as any).roles)) {

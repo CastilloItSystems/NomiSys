@@ -126,6 +126,11 @@ const AppMenuEmpresa = () => {
               icon: "pi pi-fw pi-money-bill",
               to: "/empresa/nomina/prestamos",
             },
+            {
+              label: "Prestaciones Sociales",
+              icon: "pi pi-fw pi-shield",
+              to: "/empresa/nomina/prestaciones",
+            },
           ],
         },
         {
@@ -162,11 +167,6 @@ const AppMenuEmpresa = () => {
               label: "Configuración Salarial",
               icon: "pi pi-fw pi-sliders-h",
               to: "/empresa/nomina/config/salarios",
-            },
-            {
-              label: "Períodos de Pago",
-              icon: "pi pi-fw pi-calendar",
-              to: "/empresa/nomina/config/periodos-pago",
             },
           ],
         },

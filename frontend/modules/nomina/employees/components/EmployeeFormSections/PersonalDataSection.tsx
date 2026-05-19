@@ -52,7 +52,7 @@ export default function PersonalDataSection({
           placeholder="Ej: Juan"
         />
         {errors.firstName && (
-          <small className="p-error">{errors.firstName.message}</small>
+          <small className="p-error">{errors.firstName.message as string}</small>
         )}
       </div>
 
@@ -78,7 +78,7 @@ export default function PersonalDataSection({
           placeholder="Ej: Pérez"
         />
         {errors.lastName && (
-          <small className="p-error">{errors.lastName.message}</small>
+          <small className="p-error">{errors.lastName.message as string}</small>
         )}
       </div>
 
@@ -117,7 +117,7 @@ export default function PersonalDataSection({
           )}
         />
         {errors.documentType && (
-          <small className="p-error">{errors.documentType.message}</small>
+          <small className="p-error">{errors.documentType.message as string}</small>
         )}
       </div>
 
@@ -141,7 +141,7 @@ export default function PersonalDataSection({
           )}
         />
         {errors.documentNumber && (
-          <small className="p-error">{errors.documentNumber.message}</small>
+          <small className="p-error">{errors.documentNumber.message as string}</small>
         )}
       </div>
 
@@ -168,7 +168,7 @@ export default function PersonalDataSection({
           )}
         />
         {errors.birthDate && (
-          <small className="p-error">{errors.birthDate.message}</small>
+          <small className="p-error">{errors.birthDate.message as string}</small>
         )}
       </div>
 
@@ -193,7 +193,7 @@ export default function PersonalDataSection({
           )}
         />
         {errors.gender && (
-          <small className="p-error">{errors.gender.message}</small>
+          <small className="p-error">{errors.gender.message as string}</small>
         )}
       </div>
 
@@ -215,7 +215,7 @@ export default function PersonalDataSection({
           )}
         />
         {errors.phone && (
-          <small className="p-error">{errors.phone.message}</small>
+          <small className="p-error">{errors.phone.message as string}</small>
         )}
       </div>
 
@@ -231,7 +231,7 @@ export default function PersonalDataSection({
           className={classNames({ "p-invalid": errors.email })}
         />
         {errors.email && (
-          <small className="p-error">{errors.email.message}</small>
+          <small className="p-error">{errors.email.message as string}</small>
         )}
       </div>
 
@@ -246,7 +246,7 @@ export default function PersonalDataSection({
           placeholder="Dirección completa"
         />
         {errors.address && (
-          <small className="p-error">{errors.address.message}</small>
+          <small className="p-error">{errors.address.message as string}</small>
         )}
       </div>
 
@@ -321,7 +321,7 @@ export default function PersonalDataSection({
           )}
         />
         {errors.dependents && (
-          <small className="p-error">{errors.dependents.message}</small>
+          <small className="p-error">{errors.dependents.message as string}</small>
         )}
       </div>
     </div>
